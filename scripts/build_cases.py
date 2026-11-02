@@ -52,10 +52,6 @@ def main() -> None:
         )
     out = ROOT / "tools" / "tests" / "cases.json"
     out.write_text(dump(cases) + "\n", encoding="utf-8")
-    (ROOT / "scripts" / "case_inputs.json").write_text(
-        "[\n" + ",\n".join("  " + dump(c).replace("\n", "").replace("  ", " ") for c in inputs) + "\n]\n",
-        encoding="utf-8",
-    )
     print(f"Wrote {len(cases)} cases to {out.relative_to(ROOT)}")
 
 
