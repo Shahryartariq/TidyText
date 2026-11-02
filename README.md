@@ -71,7 +71,7 @@ Each fix also has its own page (16 in total), such as `/fix-pdf-line-breaks/`, `
 
 ## Quick start
 
-You need Python 3.12+, Node 20+ (only for the JavaScript tests) and `make`. On Windows, use Git Bash or WSL, or run everything with Docker.
+You need Python 3.12+, Node 20+ (only for the JavaScript tests) and `make`. On Windows, `make` works from PowerShell, cmd or Git Bash as long as [Git for Windows](https://git-scm.com/download/win) is installed (the recipes run in its bash). WSL or Docker work too.
 
 ```bash
 git clone https://github.com/Shahryartariq/django-text-formatter.git tidytext

@@ -11,7 +11,9 @@ services:
       - path: .env
         required: false
     environment:
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env (run: make secret)}
+      # PORT in .env picks the host port above; inside, the app always uses 8000.
+      PORT: "8000"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env (run: make env)}"
     restart: unless-stopped
     # Hardening: nothing in the app needs to write to disk or gain privileges.
     read_only: true

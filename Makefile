@@ -1,12 +1,30 @@
 # TidyText shortcuts. Run `make` to see them all.
-# On Windows, use Git Bash or WSL (or run the Docker targets).
+# On Windows, this needs Git for Windows (for its bash) or WSL.
 
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 VENV   ?= .venv
-PYTHON ?= python3
-PY     := $(VENV)/bin/python
+
+# Windows venvs keep executables in Scripts/, and `python3` is usually just
+# the Microsoft Store stub, so pick the first real interpreter on PATH.
+ifeq ($(OS),Windows_NT)
+  # From PowerShell or cmd there is no /bin/bash, so borrow Git's.
+  GIT_BASH ?= C:/Program Files/Git/bin/bash.exe
+  ifneq ($(wildcard $(subst $() ,\ ,$(GIT_BASH))),)
+    SHELL := $(GIT_BASH)
+  endif
+  ifeq ($(shell echo "x"),"x")
+    $(error The recipes need bash. Install Git for Windows, or set GIT_BASH to its bash.exe)
+  endif
+  BIN    := $(VENV)/Scripts
+  EXE    := .exe
+  PYTHON ?= $(firstword $(foreach p,py python3.14 python3.13 python3.12,$(if $(shell command -v $(p) 2>/dev/null),$(p))) python)
+else
+  BIN    := $(VENV)/bin
+  PYTHON ?= python3
+endif
+PY     := $(BIN)/python$(EXE)
 PORT   ?= 8000
 IMAGE  ?= tidytext
 TAG    ?= latest
@@ -49,7 +67,7 @@ dev: ## Run the development server with auto-reload (http://localhost:8000)
 .PHONY: serve
 serve: ## Run like production locally, with Gunicorn
 	$(PY) manage.py collectstatic --noinput >/dev/null
-	DJANGO_DEBUG=0 $(VENV)/bin/gunicorn tidytext.wsgi:application --config gunicorn.conf.py
+	DJANGO_DEBUG=0 $(BIN)/gunicorn tidytext.wsgi:application --config gunicorn.conf.py
 
 .PHONY: cases
 cases: ## Regenerate the shared test cases from scripts/case_inputs.json
@@ -74,13 +92,13 @@ test-js: ## Run the JavaScript tests (Node 20+)
 
 .PHONY: lint
 lint: ## Check code style and common bugs
-	$(VENV)/bin/ruff check .
-	$(VENV)/bin/ruff format --check .
+	$(BIN)/ruff check .
+	$(BIN)/ruff format --check .
 
 .PHONY: format
 format: ## Auto-format and auto-fix code
-	$(VENV)/bin/ruff check --fix .
-	$(VENV)/bin/ruff format .
+	$(BIN)/ruff check --fix .
+	$(BIN)/ruff format .
 
 .PHONY: check
 check: ## Run Django's production deployment checks
