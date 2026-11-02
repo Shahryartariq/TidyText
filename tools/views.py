@@ -15,9 +15,9 @@ from tools.catalog import COMMON_FAQS, HOME, TOOLS, TOOLS_BY_SLUG, Tool
 MAX_INPUT_CHARS = 200_000
 
 LINE_BREAK_CHOICES = (
-    ("keep", "Keep as is"),
-    ("paragraphs", "Join lines, keep paragraphs"),
-    ("remove", "Remove all"),
+    ("keep", "Keep", "Leave line breaks as they are"),
+    ("paragraphs", "Join lines", "Join broken lines, keep paragraphs (best for PDFs)"),
+    ("remove", "Single line", "Put everything on one line"),
 )
 CASE_CHOICES = (
     ("keep", "Keep as is"),
@@ -32,14 +32,14 @@ SORT_CHOICES = (
     ("za", "Z to A"),
 )
 FLAG_CHOICES = (
-    ("remove_extra_spaces", "Remove extra spaces", "Double spaces, tabs, spaces at line ends"),
-    ("remove_empty_lines", "Remove empty lines", "Blank and whitespace-only lines"),
-    ("remove_duplicate_lines", "Remove duplicate lines", "Keeps the first copy of each line"),
-    ("fix_hyphenation", "Fix hyphenated words", "Rejoins words split across lines, like infor- mation"),
-    ("remove_invisible", "Remove invisible characters", "Zero-width spaces, soft hyphens"),
-    ("straighten_quotes", "Straight quotes", "Curly quotes and dashes to plain ones"),
-    ("strip_html", "Remove HTML tags", "Keeps the text, removes the markup"),
-    ("remove_punctuation", "Remove punctuation", "Commas, periods, quotes, dashes"),
+    ("remove_extra_spaces", "Extra spaces", "Remove double spaces, tabs and spaces at line ends"),
+    ("remove_empty_lines", "Empty lines", "Remove blank and whitespace-only lines"),
+    ("remove_duplicate_lines", "Duplicate lines", "Keep only the first copy of each line"),
+    ("fix_hyphenation", "Hyphenated words", "Rejoin words split across lines, like infor- mation"),
+    ("remove_invisible", "Invisible characters", "Remove zero-width spaces and soft hyphens"),
+    ("straighten_quotes", "Smart quotes", "Turn curly quotes and long dashes into plain ones"),
+    ("strip_html", "HTML tags", "Remove markup and keep the text"),
+    ("remove_punctuation", "Punctuation", "Remove commas, periods, quotes and dashes"),
 )
 
 
