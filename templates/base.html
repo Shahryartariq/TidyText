@@ -28,6 +28,10 @@
   <link rel="manifest" href="{% asset 'site.webmanifest' %}">
 
   <script src="{% asset 'js/theme.js' %}"></script>
+  {% if ga_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
+  <script src="{% asset 'js/analytics.js' %}" data-ga-id="{{ ga_id }}"></script>
+  {% endif %}
   <link rel="stylesheet" href="{% asset 'css/app.css' %}">
   {% block head %}{% endblock %}
 </head>
@@ -62,7 +66,7 @@
     <div class="wrap footer-inner">
       <div class="footer-brand">
         <strong>{{ app_name }}</strong>
-        <p>Clean text in your browser. No sign-up, no tracking, nothing stored.</p>
+        <p>{% if analytics_enabled %}Clean text in your browser. No sign-up, and your text is never stored.{% else %}Clean text in your browser. No sign-up, no tracking, nothing stored.{% endif %}</p>
       </div>
       <nav class="footer-links" aria-label="All tools">
         <h2>Tools</h2>

@@ -1,13 +1,20 @@
 [
   {
     "name": "no options leaves text untouched",
-    "input": "Hello,   World!\n\nSecond line.",
+    "input": "Hello,  World!\n\nSecond line.",
     "options": {},
-    "expected": "Hello,   World!\n\nSecond line.",
+    "expected": "Hello,  World!\n\nSecond line.",
     "stats": {
-      "characters": 29,
+      "characters": 28,
       "words": 4,
       "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 23,
+      "sentences": 2,
+      "paragraphs": 2,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
     }
   },
   {
@@ -19,11 +26,18 @@
       "characters": 13,
       "words": 3,
       "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 11,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
     }
   },
   {
     "name": "remove all line breaks",
-    "input": "The quick brown\nfox jumps\n\nover the  \n  lazy dog.\n",
+    "input": "The quick brown\nfox jumps\n\nover the \n lazy dog.\n",
     "options": {
       "line_breaks": "remove"
     },
@@ -32,6 +46,13 @@
       "characters": 44,
       "words": 9,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 36,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 3,
+      "speaking_seconds": 4
     }
   },
   {
@@ -45,11 +66,18 @@
       "characters": 91,
       "words": 15,
       "lines": 5
+    },
+    "details": {
+      "characters_no_spaces": 75,
+      "sentences": 3,
+      "paragraphs": 3,
+      "reading_seconds": 4,
+      "speaking_seconds": 6
     }
   },
   {
     "name": "paragraph split tolerates whitespace-only blank lines",
-    "input": "First para\nline two\n   \t\nSecond para",
+    "input": "First para\nline two\n  \t\nSecond para",
     "options": {
       "line_breaks": "paragraphs"
     },
@@ -58,11 +86,18 @@
       "characters": 32,
       "words": 6,
       "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 26,
+      "sentences": 1,
+      "paragraphs": 2,
+      "reading_seconds": 2,
+      "speaking_seconds": 3
     }
   },
   {
     "name": "remove extra spaces keeps line breaks",
-    "input": "  too    many\tspaces  \nsecond   line ",
+    "input": " too  many\tspaces \nsecond\u00a0\u00a0 line ",
     "options": {
       "flags": [
         "remove_extra_spaces"
@@ -73,11 +108,18 @@
       "characters": 27,
       "words": 5,
       "lines": 2
+    },
+    "details": {
+      "characters_no_spaces": 23,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
     }
   },
   {
     "name": "remove empty lines",
-    "input": "a\n\n   \nb\n\nc",
+    "input": "a\n\n  \nb\n\nc",
     "options": {
       "flags": [
         "remove_empty_lines"
@@ -88,6 +130,13 @@
       "characters": 5,
       "words": 3,
       "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 3,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
     }
   },
   {
@@ -103,6 +152,13 @@
       "characters": 45,
       "words": 10,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 35,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 3,
+      "speaking_seconds": 4
     }
   },
   {
@@ -118,11 +174,18 @@
       "characters": 30,
       "words": 6,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 24,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 3
     }
   },
   {
     "name": "remove invisible characters",
-    "input": "zero​width‌ join‍er﻿ soft­hyphen⁠end",
+    "input": "zero\u200bwidth\u200c join\u200der\ufeff soft\u00adhyphen\u2060end",
     "options": {
       "flags": [
         "remove_invisible"
@@ -133,6 +196,13 @@
       "characters": 30,
       "words": 3,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 28,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
     }
   },
   {
@@ -146,6 +216,13 @@
       "characters": 22,
       "words": 4,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 19,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
     }
   },
   {
@@ -159,6 +236,13 @@
       "characters": 19,
       "words": 3,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 17,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
     }
   },
   {
@@ -172,6 +256,13 @@
       "characters": 52,
       "words": 9,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 44,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 3,
+      "speaking_seconds": 4
     }
   },
   {
@@ -185,6 +276,13 @@
       "characters": 32,
       "words": 6,
       "lines": 2
+    },
+    "details": {
+      "characters_no_spaces": 27,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 3
     }
   },
   {
@@ -198,24 +296,38 @@
       "characters": 76,
       "words": 15,
       "lines": 2
+    },
+    "details": {
+      "characters_no_spaces": 62,
+      "sentences": 5,
+      "paragraphs": 1,
+      "reading_seconds": 4,
+      "speaking_seconds": 6
     }
   },
   {
     "name": "sentence case with leading quotes and spaces",
-    "input": "  \"WHAT a day\" she said. (yes) it was.",
+    "input": " \"WHAT a day\" she said. (yes) it was.",
     "options": {
       "case": "sentence"
     },
-    "expected": "  \"What a day\" she said. (Yes) it was.",
+    "expected": " \"What a day\" she said. (Yes) it was.",
     "stats": {
-      "characters": 38,
+      "characters": 37,
       "words": 8,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 29,
+      "sentences": 2,
+      "paragraphs": 1,
+      "reading_seconds": 3,
+      "speaking_seconds": 4
     }
   },
   {
     "name": "full PDF clean-up preset",
-    "input": "﻿The  report   shows\nthat sales​ grew\n\n\nby 12 percent.\nThis is\n   great news.",
+    "input": "\ufeffThe report  shows\nthat sales\u200b grew\n\n\nby 12 percent.\nThis is\n  great news.",
     "options": {
       "line_breaks": "paragraphs",
       "flags": [
@@ -228,11 +340,18 @@
       "characters": 68,
       "words": 13,
       "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 55,
+      "sentences": 2,
+      "paragraphs": 2,
+      "reading_seconds": 4,
+      "speaking_seconds": 6
     }
   },
   {
     "name": "everything at once",
-    "input": "  HELLO,   world!\n\nthis   IS a test...  \n",
+    "input": " HELLO,  world!\n\nthis  IS a test... \n",
     "options": {
       "line_breaks": "remove",
       "case": "sentence",
@@ -248,6 +367,13 @@
       "characters": 26,
       "words": 6,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 21,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 3
     }
   },
   {
@@ -265,6 +391,13 @@
       "characters": 0,
       "words": 0,
       "lines": 0
+    },
+    "details": {
+      "characters_no_spaces": 0,
+      "sentences": 0,
+      "paragraphs": 0,
+      "reading_seconds": 0,
+      "speaking_seconds": 0
     }
   },
   {
@@ -282,6 +415,291 @@
       "characters": 7,
       "words": 2,
       "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 6,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 1
+    }
+  },
+  {
+    "name": "fix hyphenated words split across lines (capitalised and numeric parts kept)",
+    "input": "The infor-\nmation was well-\nknown in North-\nAmerica and COVID-\n19 data.",
+    "options": {
+      "flags": [
+        "fix_hyphenation"
+      ],
+      "line_breaks": "paragraphs"
+    },
+    "expected": "The information was wellknown in North- America and COVID- 19 data.",
+    "stats": {
+      "characters": 67,
+      "words": 11,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 57,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 3,
+      "speaking_seconds": 5
+    }
+  },
+  {
+    "name": "straight quotes, dashes and ellipsis",
+    "input": "“Smart” ‘quotes’ — en–dash… done″ 5′",
+    "options": {
+      "flags": [
+        "straighten_quotes"
+      ]
+    },
+    "expected": "\"Smart\" 'quotes' - en-dash... done\" 5'",
+    "stats": {
+      "characters": 38,
+      "words": 6,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 33,
+      "sentences": 2,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 3
+    }
+  },
+  {
+    "name": "remove duplicate lines keeps first copy and blank lines",
+    "input": "apple\nbanana\napple\n\nBanana\nbanana\n\ncherry",
+    "options": {
+      "flags": [
+        "remove_duplicate_lines"
+      ]
+    },
+    "expected": "apple\nbanana\n\nBanana\n\ncherry",
+    "stats": {
+      "characters": 28,
+      "words": 4,
+      "lines": 6
+    },
+    "details": {
+      "characters_no_spaces": 23,
+      "sentences": 1,
+      "paragraphs": 3,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "sort lines A to Z ignoring case, blanks last",
+    "input": "banana\n\nApple\ncherry\napple\nÄpfel",
+    "options": {
+      "sort": "az"
+    },
+    "expected": "Äpfel\nApple\napple\nbanana\ncherry\n",
+    "stats": {
+      "characters": 32,
+      "words": 5,
+      "lines": 6
+    },
+    "details": {
+      "characters_no_spaces": 27,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "sort lines Z to A",
+    "input": "b\na\nc",
+    "options": {
+      "sort": "za"
+    },
+    "expected": "c\nb\na",
+    "stats": {
+      "characters": 5,
+      "words": 3,
+      "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 3,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "strip HTML tags, comments and scripts",
+    "input": "<h1>Title</h1><!-- note --><p>Hello&nbsp;<b>world</b> &amp; friends &lt;3</p><script>alert(1)</script><style>p{}</style>Line<br>break &#169; &#x1F600; &bogus; a < b > c",
+    "options": {
+      "flags": [
+        "strip_html"
+      ]
+    },
+    "expected": "Title\nHello\u00a0world & friends <3\nLine\nbreak © 😀 &bogus; a < b > c",
+    "stats": {
+      "characters": 63,
+      "words": 16,
+      "lines": 4
+    },
+    "details": {
+      "characters_no_spaces": 48,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 5,
+      "speaking_seconds": 7
+    }
+  },
+  {
+    "name": "find and replace is literal and case-sensitive",
+    "input": "Cat cat CAT (cat)",
+    "options": {
+      "find": "cat",
+      "replace": "dog"
+    },
+    "expected": "Cat dog CAT (dog)",
+    "stats": {
+      "characters": 17,
+      "words": 4,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 14,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "find and replace supports \\n escapes (list to commas)",
+    "input": "red\ngreen\nblue",
+    "options": {
+      "find": "\\n",
+      "replace": ", "
+    },
+    "expected": "red, green, blue",
+    "stats": {
+      "characters": 16,
+      "words": 3,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 14,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "find with regex characters is treated as plain text",
+    "input": "a.b.c a*b",
+    "options": {
+      "find": ".",
+      "replace": "-"
+    },
+    "expected": "a-b-c a*b",
+    "stats": {
+      "characters": 9,
+      "words": 2,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 8,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 1
+    }
+  },
+  {
+    "name": "PDF clean-up with hyphenation and quotes",
+    "input": "“The commit-\ntee met on\nTuesday.”\n\nNo changes\nwere made…",
+    "options": {
+      "line_breaks": "paragraphs",
+      "flags": [
+        "fix_hyphenation",
+        "straighten_quotes",
+        "remove_extra_spaces"
+      ]
+    },
+    "expected": "\"The committee met on Tuesday.\"\n\nNo changes were made...",
+    "stats": {
+      "characters": 56,
+      "words": 9,
+      "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 47,
+      "sentences": 2,
+      "paragraphs": 2,
+      "reading_seconds": 3,
+      "speaking_seconds": 4
+    }
+  },
+  {
+    "name": "sorted unique list",
+    "input": " pear\napple\npear\n \nApple",
+    "options": {
+      "sort": "az",
+      "flags": [
+        "remove_extra_spaces",
+        "remove_duplicate_lines",
+        "remove_empty_lines"
+      ]
+    },
+    "expected": "Apple\napple\npear",
+    "stats": {
+      "characters": 16,
+      "words": 3,
+      "lines": 3
+    },
+    "details": {
+      "characters_no_spaces": 14,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 1,
+      "speaking_seconds": 2
+    }
+  },
+  {
+    "name": "word counter details",
+    "input": "Hello there! How are you?\n\nThis is the 2nd paragraph. It has three sentences... Right\n",
+    "options": {},
+    "expected": "Hello there! How are you?\n\nThis is the 2nd paragraph. It has three sentences... Right\n",
+    "stats": {
+      "characters": 86,
+      "words": 15,
+      "lines": 4
+    },
+    "details": {
+      "characters_no_spaces": 70,
+      "sentences": 5,
+      "paragraphs": 2,
+      "reading_seconds": 4,
+      "speaking_seconds": 6
+    }
+  },
+  {
+    "name": "unicode spaces count as word separators",
+    "input": "one\u00a0two\u2003three\u3000four",
+    "options": {},
+    "expected": "one\u00a0two\u2003three\u3000four",
+    "stats": {
+      "characters": 18,
+      "words": 4,
+      "lines": 1
+    },
+    "details": {
+      "characters_no_spaces": 15,
+      "sentences": 1,
+      "paragraphs": 1,
+      "reading_seconds": 2,
+      "speaking_seconds": 2
     }
   }
 ]

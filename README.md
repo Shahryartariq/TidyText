@@ -28,20 +28,29 @@ Paste text copied from a PDF, email or web page. Pick what to fix. Copy the clea
 | Problem | Fix |
 | --- | --- |
 | Text from a PDF breaks at the end of every line | **Join lines, keep paragraphs** |
+| PDF splits words across lines ("infor- mation") | **Fix hyphenated words** |
 | Everything should be on one line | **Remove all line breaks** |
 | Double spaces, tabs, spaces at line ends | **Remove extra spaces** |
 | Blank lines everywhere | **Remove empty lines** |
+| A list full of repeats | **Remove duplicate lines** |
+| A list in random order | **Sort lines** A to Z or Z to A (ignores case and accents) |
+| Curly quotes and long dashes break code or CSV | **Straight quotes** |
+| Copied HTML instead of text | **Remove HTML tags** (decodes entities, keeps line breaks) |
 | Zero-width spaces and soft hyphens breaking code or passwords | **Remove invisible characters** |
 | Commas, quotes, dashes in the way | **Remove punctuation** (any language) |
+| A word needs changing everywhere | **Find and replace** (supports `\n` for new lines) |
 | Caps lock was on | **Sentence case, lowercase, UPPERCASE, Title Case** |
+| How long is this? | **Word counter**: words, characters, sentences, paragraphs, reading and speaking time |
+
+You can paste with one click, open a text file or drag it onto the page. Files are read on your device and never uploaded.
 
 The result updates as you type, and a highlighted counter shows exactly how many characters, words and lines changed.
 
-Each fix also has its own page, such as `/fix-pdf-line-breaks/` and `/remove-extra-spaces/`, so people searching for that exact problem land on a page that solves it.
+Each fix also has its own page (16 in total), such as `/fix-pdf-line-breaks/`, `/word-counter/` and `/remove-duplicate-lines/`, so people searching for that exact problem land on a page that solves it.
 
 ## Why it's built this way
 
-- **Private.** Text is cleaned in the browser by `static/js/transforms.js`. Nothing is uploaded. No cookies, accounts, analytics or ads.
+- **Private.** Text is cleaned in the browser by `static/js/transforms.js`. Nothing is uploaded. No cookies, accounts or ads, and no analytics unless you turn them on.
 - **Works without JavaScript.** The same form posts to Django, which runs the identical Python implementation (`tools/transforms.py`). Both are tested against one shared set of cases, so they always agree.
 - **Fast.** No frameworks, no web fonts, no third-party requests. The home page is about 4 KB gzipped. Pages set no cookies, so the CDN caches them.
 - **Secure.** Strict Content-Security-Policy with no inline scripts, HSTS, clickjacking protection, Permissions-Policy, input size limits, no database and no admin panel. See [SECURITY.md](SECURITY.md).
@@ -100,7 +109,18 @@ Run `make` to see them all.
    - `DJANGO_SECRET_KEY`: a long random value (run `make secret`). **Required.**
    - `SITE_URL`: your public address, for example `https://tidytext.vercel.app` (recommended, used for canonical links and the sitemap).
    - `DJANGO_ALLOWED_HOSTS`: only if you add a custom domain, for example `tidytext.com,www.tidytext.com`. Vercel's own domains are allowed automatically.
+   - `GA_MEASUREMENT_ID`: optional, your Google Analytics 4 ID (see below).
 3. Deploy. Static files are served from Vercel's CDN, and pages are cached at the edge until the next deploy.
+
+## Google Analytics
+
+Don't paste Google's tag snippet into a template: the Content-Security-Policy blocks inline scripts, so it wouldn't run. Instead, set `GA_MEASUREMENT_ID` (for example `G-ABC123XYZ9`) and redeploy. TidyText then:
+
+- loads `gtag.js` and a small static `analytics.js`, so no inline script is needed;
+- adds only Google's analytics domains to the security policy;
+- switches the privacy page, About page and footer to say that Google Analytics is used.
+
+Only page views are sent. The text people clean is never sent to Google. If you have visitors in the EU or UK, check whether you need a cookie consent banner.
 
 ## Run with Docker
 
@@ -134,6 +154,7 @@ All settings come from environment variables. See [`.env.example`](.env.example)
 | `SITE_URL` | request host | Public base URL for canonical links, sitemap and social cards |
 | `DJANGO_SECURE_SSL_REDIRECT` | `0` | Redirect HTTP to HTTPS (Vercel already does this) |
 | `DJANGO_HSTS_SECONDS` | `31536000` | HSTS max age in production |
+| `GA_MEASUREMENT_ID` | (none) | Optional Google Analytics 4 ID, e.g. `G-ABC123XYZ9` |
 | `WEB_CONCURRENCY` | CPU based, max 4 | Gunicorn workers (Docker) |
 
 ## Project structure

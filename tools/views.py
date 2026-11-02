@@ -26,10 +26,19 @@ CASE_CHOICES = (
     ("upper", "UPPERCASE"),
     ("title", "Title Case"),
 )
+SORT_CHOICES = (
+    ("keep", "Keep order"),
+    ("az", "A to Z"),
+    ("za", "Z to A"),
+)
 FLAG_CHOICES = (
     ("remove_extra_spaces", "Remove extra spaces", "Double spaces, tabs, spaces at line ends"),
     ("remove_empty_lines", "Remove empty lines", "Blank and whitespace-only lines"),
+    ("remove_duplicate_lines", "Remove duplicate lines", "Keeps the first copy of each line"),
+    ("fix_hyphenation", "Fix hyphenated words", "Rejoins words split across lines, like infor- mation"),
     ("remove_invisible", "Remove invisible characters", "Zero-width spaces, soft hyphens"),
+    ("straighten_quotes", "Straight quotes", "Curly quotes and dashes to plain ones"),
+    ("strip_html", "Remove HTML tags", "Keeps the text, removes the markup"),
     ("remove_punctuation", "Remove punctuation", "Commas, periods, quotes, dashes"),
 )
 
@@ -89,6 +98,9 @@ def _options_from_post(request: HttpRequest) -> transforms.Options:
         request.POST.get("line_breaks", "keep"),
         request.POST.get("case", "keep"),
         request.POST.getlist("flags"),
+        request.POST.get("sort", "keep"),
+        request.POST.get("find", ""),
+        request.POST.get("replace", ""),
     )
 
 
@@ -125,6 +137,7 @@ def tool_page(request: HttpRequest, slug: str = "") -> HttpResponse:
     page_url = request.site_url + request.path
     before = transforms.stats(text)
     after = transforms.stats(output) if output is not None else None
+    details = transforms.details(output if output is not None else text)
 
     response = render(
         request,
@@ -139,9 +152,14 @@ def tool_page(request: HttpRequest, slug: str = "") -> HttpResponse:
             "error": error,
             "before": before,
             "after": after,
+            "details": details,
+            "shown": after if after is not None else before,
+            "show_details": tool.show_details,
+            "show_find": tool.show_find or bool(options.find),
             "faqs": faqs,
             "line_break_choices": LINE_BREAK_CHOICES,
             "case_choices": CASE_CHOICES,
+            "sort_choices": SORT_CHOICES,
             "flag_choices": FLAG_CHOICES,
             "max_chars": MAX_INPUT_CHARS,
             "structured_data": _structured_data(request, tool, faqs, page_url),

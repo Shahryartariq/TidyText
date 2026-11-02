@@ -129,3 +129,53 @@ class SecurityHeaderTests(SimpleTestCase):
         self.assertFalse(response.cookies)
         self.assertIn("s-maxage=86400", response["Cache-Control"])
         self.assertIn("public", response["Cache-Control"])
+
+
+class NewToolTests(SimpleTestCase):
+    def test_word_counter_opens_the_stats_panel(self):
+        response = self.client.get("/word-counter/")
+        self.assertContains(response, '<details class="more-stats" open>')
+        self.assertContains(response, 'data-detail="reading_seconds"')
+
+    def test_find_and_replace_page_opens_the_panel_with_a_preset(self):
+        response = self.client.get("/find-and-replace/")
+        self.assertContains(response, '<details class="option-group find-replace" open>')
+        self.assertContains(response, 'value="colour"')
+        self.assertContains(response, "The color of the sky changes color at sunset.")
+
+    def test_post_sort_dedupe_and_find_replace(self):
+        response = self.client.post(
+            "/",
+            {
+                "text": "pear\napple\npear\nfig",
+                "sort": "az",
+                "flags": ["remove_duplicate_lines"],
+                "find": "fig",
+                "replace": "kiwi",
+            },
+        )
+        self.assertContains(response, ">apple\nkiwi\npear</textarea>")
+
+    def test_post_strip_html_never_renders_markup(self):
+        response = self.client.post("/", {"text": "<img src=x onerror=alert(1)>Hi", "flags": ["strip_html"]})
+        self.assertContains(response, ">Hi</textarea>")
+        self.assertNotContains(response, "<img src=x")
+
+
+class AnalyticsTests(SimpleTestCase):
+    def test_no_analytics_by_default(self):
+        response = self.client.get("/")
+        self.assertNotContains(response, "googletagmanager")
+        self.assertContains(self.client.get("/privacy/"), "no analytics")
+
+    def test_analytics_tag_and_csp_when_configured(self):
+        from tidytext.settings import build_csp
+
+        with self.settings(GA_MEASUREMENT_ID="G-TEST12345", SECURE_CSP=build_csp(analytics=True)):
+            response = self.client.get("/")
+            self.assertContains(response, 'src="https://www.googletagmanager.com/gtag/js?id=G-TEST12345"')
+            self.assertContains(response, 'data-ga-id="G-TEST12345"')
+            csp = response["Content-Security-Policy"]
+            self.assertIn("script-src 'self' https://www.googletagmanager.com", csp)
+            self.assertNotIn("unsafe-inline", csp)
+            self.assertContains(self.client.get("/privacy/"), "Google Analytics")

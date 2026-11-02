@@ -8,6 +8,7 @@ TidyText is stateless: no database, no sessions, no cookies, no user accounts.
 """
 
 import os
+import re
 import warnings
 from pathlib import Path
 
@@ -145,23 +146,53 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 X_FRAME_OPTIONS = "DENY"
 
-SECURE_CSP = {
-    "default-src": [CSP.SELF],
-    "script-src": [CSP.SELF],
-    "style-src": [CSP.SELF],
-    "img-src": [CSP.SELF, "data:"],
-    "font-src": [CSP.SELF],
-    "connect-src": [CSP.SELF],
-    "manifest-src": [CSP.SELF],
-    "form-action": [CSP.SELF],
-    "frame-ancestors": [CSP.NONE],
-    "base-uri": [CSP.NONE],
-    "object-src": [CSP.NONE],
+# --- Analytics (optional) ---------------------------------------------------
+
+# Google Analytics 4 measurement ID, e.g. G-ABC123XYZ9. Leave unset for no analytics.
+# Set it as an environment variable; the tag is loaded from a static file so the
+# Content-Security-Policy below never needs to allow inline scripts.
+_ga = os.environ.get("GA_MEASUREMENT_ID", "").strip().upper()
+GA_MEASUREMENT_ID = _ga if re.fullmatch(r"G-[A-Z0-9]{4,20}", _ga) else ""
+
+GOOGLE_ANALYTICS_CSP = {
+    "script-src": ["https://www.googletagmanager.com"],
+    "connect-src": [
+        "https://*.google-analytics.com",
+        "https://*.analytics.google.com",
+        "https://*.googletagmanager.com",
+    ],
+    "img-src": ["https://*.google-analytics.com", "https://*.googletagmanager.com"],
 }
-if ON_VERCEL or SECURE_SSL_REDIRECT or SITE_URL.startswith("https://"):
-    # Only when the site is known to be served over HTTPS; otherwise a plain-HTTP
-    # local Docker run would have its own CSS and JS upgraded to https:// and fail.
-    SECURE_CSP["upgrade-insecure-requests"] = True
+
+
+def build_csp(analytics: bool = False, https: bool = False) -> dict:
+    csp = {
+        "default-src": [CSP.SELF],
+        "script-src": [CSP.SELF],
+        "style-src": [CSP.SELF],
+        "img-src": [CSP.SELF, "data:"],
+        "font-src": [CSP.SELF],
+        "connect-src": [CSP.SELF],
+        "manifest-src": [CSP.SELF],
+        "form-action": [CSP.SELF],
+        "frame-ancestors": [CSP.NONE],
+        "base-uri": [CSP.NONE],
+        "object-src": [CSP.NONE],
+    }
+    if analytics:
+        for directive, sources in GOOGLE_ANALYTICS_CSP.items():
+            csp[directive] = csp[directive] + sources
+    if https:
+        # Only when the site is known to be served over HTTPS; otherwise a plain-HTTP
+        # local Docker run would have its own CSS and JS upgraded to https:// and fail.
+        csp["upgrade-insecure-requests"] = True
+    return csp
+
+
+SECURE_CSP = build_csp(
+    analytics=bool(GA_MEASUREMENT_ID),
+    https=ON_VERCEL or SECURE_SSL_REDIRECT or SITE_URL.startswith("https://"),
+)
 
 SILENCED_SYSTEM_CHECKS = [
     # No CSRF middleware by design (see MIDDLEWARE above): no cookies, sessions or accounts.

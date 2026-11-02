@@ -22,10 +22,12 @@ class Tool:
     options: Options
     example: str
     faqs: tuple[tuple[str, str], ...] = field(default_factory=tuple)
+    show_find: bool = False  # open the find and replace panel
+    show_details: bool = False  # open the word count panel
 
 
-def _opts(line_breaks="keep", case="keep", *flags: str) -> Options:
-    return Options.build(line_breaks, case, flags)
+def _opts(line_breaks="keep", case="keep", *flags: str, sort="keep", find="", replace="") -> Options:
+    return Options.build(line_breaks, case, flags, sort, find, replace)
 
 
 HOME = Tool(
@@ -42,8 +44,10 @@ HOME = Tool(
         "Paste text from a PDF, email or web page, choose what to fix, then copy the clean "
         "version. It all happens instantly in your browser."
     ),
-    options=_opts("paragraphs", "keep", "remove_extra_spaces", "remove_invisible"),
-    example="This report was\ncopied  from a   PDF,   so\nevery line   is broken.\n\n\nTidyText fixes it.",
+    options=_opts("paragraphs", "keep", "remove_extra_spaces", "remove_invisible", "fix_hyphenation"),
+    example=(
+        "This report was\ncopied  from a   PDF,   so\nevery line   is bro-\nken.\n\n\nTidyText fixes it."
+    ),
 )
 
 TOOLS: tuple[Tool, ...] = (
@@ -61,8 +65,10 @@ TOOLS: tuple[Tool, ...] = (
             "Text copied from a PDF breaks at the end of every printed line. This joins the "
             "lines back together while keeping the blank line between paragraphs."
         ),
-        options=_opts("paragraphs", "keep", "remove_extra_spaces", "remove_invisible"),
-        example="The committee met on\nTuesday to review the\nannual budget.\n\nNo changes\nwere approved.",
+        options=_opts("paragraphs", "keep", "remove_extra_spaces", "remove_invisible", "fix_hyphenation"),
+        example=(
+            "The committee met on\nTuesday to review the\nannual bud-\nget.\n\nNo changes\nwere approved."
+        ),
         faqs=(
             (
                 "Why does text copied from a PDF have so many line breaks?",
@@ -73,6 +79,14 @@ TOOLS: tuple[Tool, ...] = (
                 "Will my paragraphs be merged together?",
                 "No. Lines are joined only within a paragraph. A blank line between "
                 "paragraphs is kept, so the structure of the document stays intact.",
+            ),
+            (
+                "What does “Fix hyphenated words” do?",
+                "PDFs often split a long word across two lines with a hyphen, like “infor-” "
+                "and “mation”. This joins them back into one word. It only joins when the next "
+                "line starts with a small letter, so names like “North-America” stay as they "
+                "are. Real compound words split at the line end, such as “well-known”, are "
+                "joined too, so give those a quick check.",
             ),
         ),
     ),
@@ -216,6 +230,181 @@ TOOLS: tuple[Tool, ...] = (
         ),
     ),
     Tool(
+        slug="word-counter",
+        name="Word counter",
+        title="Word Counter: Count Words, Characters and Reading Time",
+        description=(
+            "Count words, characters with and without spaces, sentences, paragraphs and "
+            "lines, and see reading and speaking time. Free, instant and private."
+        ),
+        heading="Word and character counter",
+        summary="Words, characters, sentences and reading time.",
+        intro=(
+            "Paste your text to count words, characters, sentences and paragraphs as you "
+            "type, with estimated reading and speaking time."
+        ),
+        options=_opts(),
+        example=(
+            "Paste your essay, post or script here. The counts update as you type.\n\n"
+            "Reading time assumes an average adult reader. Speaking time suits talks and videos."
+        ),
+        show_details=True,
+        faqs=(
+            (
+                "How are words counted?",
+                "A word is any group of characters separated by spaces or line breaks, so "
+                "“well-known” counts as one word and “3.5” counts as one word.",
+            ),
+            (
+                "How is reading time calculated?",
+                "Reading time uses 238 words per minute, the average silent reading speed for "
+                "adults. Speaking time uses 150 words per minute, a comfortable pace for talks.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="remove-duplicate-lines",
+        name="Remove duplicate lines",
+        title="Remove Duplicate Lines Online: Keep Unique Lines",
+        description=(
+            "Delete repeated lines from a list and keep the first copy of each, in the "
+            "original order. Great for emails, keywords and data. Free and private."
+        ),
+        heading="Remove duplicate lines",
+        summary="Keep only the first copy of each line.",
+        intro=(
+            "Delete every repeated line and keep the first copy, in its original position. "
+            "Turn on Remove extra spaces to also catch lines that differ only in spacing."
+        ),
+        options=_opts("keep", "keep", "remove_duplicate_lines"),
+        example="alice@example.com\nbob@example.com\nalice@example.com\ncarol@example.com\nbob@example.com",
+        faqs=(
+            (
+                "Is the comparison case-sensitive?",
+                "Yes. “Apple” and “apple” are different lines. Set Letter case to lowercase "
+                "first if you want them treated as the same.",
+            ),
+            (
+                "Does it change the order of my lines?",
+                "No. Lines keep their original order. Choose A to Z under Sort lines if you "
+                "also want them sorted.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="sort-lines-alphabetically",
+        name="Sort lines A to Z",
+        title="Sort Lines Alphabetically Online: A to Z or Z to A",
+        description=(
+            "Sort a list of lines alphabetically, A to Z or Z to A. Ignores capital letters "
+            "and accents, and can remove duplicates too. Free and private."
+        ),
+        heading="Sort lines alphabetically",
+        summary="Put a list in A to Z or Z to A order.",
+        intro=(
+            "Put any list in alphabetical order. Capital letters and accents are ignored, so "
+            "“apple”, “Äpfel” and “Banana” sort the way you'd expect."
+        ),
+        options=_opts("keep", "keep", "remove_empty_lines", "remove_extra_spaces", sort="az"),
+        example="Mango\nbanana\nApple\ncherry\n\nÄpfel",
+        faqs=(
+            (
+                "How are numbers sorted?",
+                "Character by character, so “10” comes before “9”. Add a leading zero, such "
+                "as “09”, to sort numbers by value.",
+            ),
+            (
+                "What happens to empty lines?",
+                "They move to the end of the list. Turn on Remove empty lines to delete them.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="find-and-replace",
+        name="Find and replace",
+        title="Find and Replace Text Online: Free and Instant",
+        description=(
+            "Replace every copy of a word or phrase in your text at once. Supports new lines "
+            "and tabs, so you can turn a list into comma-separated text. Free and private."
+        ),
+        heading="Find and replace text",
+        summary="Replace every copy of a word or phrase.",
+        intro=(
+            "Replace every copy of a word or phrase at once. Type \\n to match a new line, "
+            "for example to turn a list into comma-separated values."
+        ),
+        options=_opts(find="colour", replace="color"),
+        example="The colour of the sky changes colour at sunset.",
+        show_find=True,
+        faqs=(
+            (
+                "How do I turn a list into comma-separated values?",
+                "Find \\n and replace it with a comma and a space. Every line break becomes "
+                "“, ”, so a list of lines becomes one line of comma-separated values.",
+            ),
+            (
+                "Can I use regular expressions?",
+                "No. Find matches the exact text you type, including capital letters, so "
+                "characters such as . and * are treated literally.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="smart-quotes-to-straight-quotes",
+        name="Straight quotes",
+        title="Convert Smart Quotes to Straight Quotes Online",
+        description=(
+            "Replace curly “smart” quotes, apostrophes, en and em dashes and ellipses with "
+            "plain keyboard characters for code, CSV and CMS. Free and private."
+        ),
+        heading="Convert smart quotes to straight quotes",
+        summary="Turn curly quotes and dashes into plain ones.",
+        intro=(
+            "Word processors replace your quotes with curly ones that break code, CSV files "
+            "and some websites. This turns them, and fancy dashes, back into plain characters."
+        ),
+        options=_opts("keep", "keep", "straighten_quotes"),
+        example="“It’s ready,” she said — finally… Use ‘single’ quotes – not curly ones.",
+        faqs=(
+            (
+                "Which characters are changed?",
+                "Curly double quotes become \", curly single quotes and apostrophes become ', "
+                "en and em dashes become a hyphen, and the … character becomes three dots.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="remove-html-tags",
+        name="Remove HTML tags",
+        title="Remove HTML Tags: Convert HTML to Plain Text",
+        description=(
+            "Strip HTML tags, comments, scripts and styles and keep the readable text, with "
+            "line breaks and entities like &amp; decoded. Free and private."
+        ),
+        heading="Remove HTML tags",
+        summary="Strip the markup and keep the readable text.",
+        intro=(
+            "Paste HTML and get plain text back. Tags, comments, scripts and styles are "
+            "removed, line breaks are kept and entities such as &nbsp; are decoded."
+        ),
+        options=_opts("keep", "keep", "strip_html", "remove_extra_spaces", "remove_empty_lines"),
+        example=(
+            "<h2>Opening hours</h2>\n<p>Monday to Friday, <b>9&nbsp;am</b> to 5 pm.</p>\n"
+            "<!-- updated weekly -->\n<p>Closed on public holidays &amp; Sundays.</p>"
+        ),
+        faqs=(
+            (
+                "Is it safe to paste HTML here?",
+                "Yes. The HTML is never run or displayed as a web page. It's treated as plain "
+                "text and cleaned in your browser.",
+            ),
+            (
+                "Will text like “a < b” be removed?",
+                "No. Only real tags, which start with < followed by a letter or /, are removed.",
+            ),
+        ),
+    ),
+    Tool(
         slug="uppercase-converter",
         name="UPPERCASE",
         title="Uppercase Converter: Convert Text to ALL CAPS",
@@ -304,6 +493,6 @@ COMMON_FAQS: tuple[tuple[str, str], ...] = (
     ),
     (
         "Is TidyText free?",
-        "Yes. There's no sign-up, no limit on how often you use it, and no ads.",
+        "Yes. There's no sign-up, no ads and no limit on how often you use it.",
     ),
 )

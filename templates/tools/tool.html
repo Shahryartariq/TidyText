@@ -49,6 +49,17 @@
       </div>
     </div>
 
+    <div class="option-group">
+      <label class="option-label" for="sort">Sort lines</label>
+      <div class="select select-narrow">
+        <select id="sort" name="sort">
+          {% for value, label in sort_choices %}
+          <option value="{{ value }}"{% if options.sort == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
     <div class="option-group option-flags">
       <span class="option-label" id="flags-label">Clean up</span>
       <div class="flags" role="group" aria-labelledby="flags-label">
@@ -60,6 +71,21 @@
         {% endfor %}
       </div>
     </div>
+
+    <details class="option-group find-replace"{% if show_find %} open{% endif %}>
+      <summary>Find and replace</summary>
+      <div class="find-fields">
+        <label>
+          <span class="option-label">Find</span>
+          <input type="text" name="find" value="{{ options.find }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Text to find" data-find>
+        </label>
+        <label>
+          <span class="option-label">Replace with</span>
+          <input type="text" name="replace" value="{{ options.replace }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Leave empty to delete">
+        </label>
+        <p class="hint">Matches exact text and capital letters. Type <code>\n</code> for a new line or <code>\t</code> for a tab. Runs first, on your original text.</p>
+      </div>
+    </details>
   </fieldset>
 
   {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
@@ -68,10 +94,15 @@
     <div class="pane">
       <div class="pane-head">
         <label for="input">Your text</label>
-        <button class="link-button" type="button" data-action="clear">Clear</button>
+        <div class="pane-actions">
+          <button class="link-button js-only" type="button" data-action="paste">Paste</button>
+          <button class="link-button js-only" type="button" data-action="open">Open file</button>
+          <button class="link-button" type="button" data-action="clear">Clear</button>
+          <input class="visually-hidden" type="file" accept=".txt,.md,.csv,.tsv,.html,.htm,.json,.log,.srt,.xml,text/*" tabindex="-1" aria-hidden="true" data-file>
+        </div>
       </div>
       <textarea id="input" name="text" spellcheck="false" autocomplete="off" autocapitalize="off"
-        maxlength="{{ max_chars }}" placeholder="Paste or type your text here" data-input>{{ text }}</textarea>
+        maxlength="{{ max_chars }}" placeholder="Paste or type your text here, or drop a .txt file" data-input>{{ text }}</textarea>
       <p class="pane-foot" data-stats="before">
         <span>{% include "tools/_delta.html" with label="character" a=before.characters b=before.characters %}</span>
         <span>{% include "tools/_delta.html" with label="word" a=before.words b=before.words %}</span>
@@ -97,6 +128,21 @@
       </p>
     </div>
   </div>
+
+  <details class="more-stats"{% if show_details %} open{% endif %}>
+    <summary>Word count and reading time</summary>
+    <dl class="stat-grid" data-details>
+      <div><dt>Words</dt><dd data-detail="words">{{ shown.words|num }}</dd></div>
+      <div><dt>Characters</dt><dd data-detail="characters">{{ shown.characters|num }}</dd></div>
+      <div><dt>Characters without spaces</dt><dd data-detail="characters_no_spaces">{{ details.characters_no_spaces|num }}</dd></div>
+      <div><dt>Sentences</dt><dd data-detail="sentences">{{ details.sentences|num }}</dd></div>
+      <div><dt>Paragraphs</dt><dd data-detail="paragraphs">{{ details.paragraphs|num }}</dd></div>
+      <div><dt>Lines</dt><dd data-detail="lines">{{ shown.lines|num }}</dd></div>
+      <div><dt>Reading time</dt><dd data-detail="reading_seconds">{{ details.reading_seconds|duration }}</dd></div>
+      <div><dt>Speaking time</dt><dd data-detail="speaking_seconds">{{ details.speaking_seconds|duration }}</dd></div>
+    </dl>
+    <p class="hint">Counts are for the clean text. Reading time assumes 238 words per minute, speaking time 150.</p>
+  </details>
 
   <div class="submit-row">
     <button class="button button-primary" type="submit" data-submit>Clean text</button>
