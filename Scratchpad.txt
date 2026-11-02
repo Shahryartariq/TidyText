@@ -1,8 +1,0 @@
-python -m venv venv
-.\venv\Scripts\Activate
-pip install django
-django-admin startproject myproject .
-python manage.py runserver
-pip freeze > requirements.txt
-python -m django --version
-pip install -r requirements.txt

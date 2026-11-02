@@ -1,56 +1,29 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-__pycache__/
-# Virtual Environment
-myenv/
+.venv/
 venv/
 env/
-.venv/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# Static files (if collected)
-staticfiles/
-static/
-
-# Environment variables
-.env
-.env.*
-
-# PyCharm / VS Code
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Migrations (optional – usually you keep them)
-# */migrations/*
-# !*/migrations/__init__.py
-
-# Python build files
-build/
-dist/
-*.egg-info/
-
-# Coverage / testing
+.ruff_cache/
 .coverage
 htmlcov/
-.pytest_cache/
 
-# Node (if you use frontend with Django)
-node_modules/
-
-# Logs
+# Django
+staticfiles/
 *.log
+db.sqlite3
+media/
 
-# Docker (if using)
-docker-compose.override.yml
+# Environment
+.env
+.env.*
+!.env.example
+
+# Deploy
+.vercel/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

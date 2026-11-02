@@ -1,0 +1,91 @@
+{% load assets %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}Clean up messy text: fix line breaks, extra spaces and letter case. Free, instant and private.{% endblock %}">
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#F4F7F3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0F1A21" media="(prefers-color-scheme: dark)">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ app_name }}">
+  <meta property="og:title" content="{% block og_title %}{{ app_name }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Clean up messy text in seconds. Free, instant and private.{% endblock %}">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:image" content="{{ site_url }}{% asset 'img/og-image.png' %}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{ app_name }}: clean up messy text in seconds">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="{% asset 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% asset 'img/favicon.ico' %}" sizes="32x32">
+  <link rel="apple-touch-icon" href="{% asset 'img/apple-touch-icon.png' %}">
+  <link rel="manifest" href="{% asset 'site.webmanifest' %}">
+
+  <script src="{% asset 'js/theme.js' %}"></script>
+  {% if ga_id %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_id }}"></script>
+  <script src="{% asset 'js/analytics.js' %}" data-ga-id="{{ ga_id }}"></script>
+  {% endif %}
+  <link rel="stylesheet" href="{% asset 'css/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="{{ app_name }} home">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect width="32" height="32" rx="8" fill="currentColor"/>
+          <path d="M8 10.5h16M8 16h16M8 21.5h9" stroke="var(--mark-lines)" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+        <span>{{ app_name }}</span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="{% url 'home' %}#tools">Tools</a>
+        <a href="{% url 'about' %}">About</a>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Change color theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 9 9A7 7 0 0 1 12 3Z" fill="currentColor"/></svg>
+          <span data-theme-label>Auto</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <strong>{{ app_name }}</strong>
+        <p>{% if analytics_enabled %}Clean text in your browser. No sign-up, and your text is never stored.{% else %}Clean text in your browser. No sign-up, no tracking, nothing stored.{% endif %}</p>
+      </div>
+      <nav class="footer-links" aria-label="All tools">
+        <h2>Tools</h2>
+        <ul>
+          {% for t in tools %}<li><a href="{% url 'tool' t.slug %}">{{ t.name }}</a></li>{% endfor %}
+        </ul>
+      </nav>
+      <nav class="footer-links" aria-label="About">
+        <h2>{{ app_name }}</h2>
+        <ul>
+          <li><a href="{% url 'about' %}">About</a></li>
+          <li><a href="{% url 'privacy' %}">Privacy</a></li>
+          <li><a href="https://github.com/Shahryartariq" rel="noopener">Made by Muhammad Shehryar</a></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="wrap footer-meta">Version {{ app_version }}</p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
