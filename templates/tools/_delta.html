@@ -1,0 +1,1 @@
+{% load humanize_lite %}<b>{{ b|num }}</b> {{ label }}{{ b|pluralize }}{% if a != b %} <mark class="delta">{{ b|delta:a }}</mark>{% endif %}

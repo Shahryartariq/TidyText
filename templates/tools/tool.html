@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load assets humanize_lite %}
+
+{% block title %}{{ tool.title }}{% endblock %}
+{% block description %}{{ tool.description }}{% endblock %}
+{% block og_title %}{{ tool.title }}{% endblock %}
+{% block og_description %}{{ tool.description }}{% endblock %}
+{% block robots %}{% if error %}noindex, follow{% else %}index, follow{% endif %}{% endblock %}
+{% block head %}<script type="application/ld+json">{{ structured_data }}</script>{% endblock %}
+
+{% block content %}
+{% if not is_home %}
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="{% url 'home' %}">{{ app_name }}</a>
+  <span aria-hidden="true">/</span>
+  <span aria-current="page">{{ tool.name }}</span>
+</nav>
+{% endif %}
+
+<section class="intro">
+  <h1>{{ tool.heading }}</h1>
+  <p class="lede">{{ tool.intro }}</p>
+</section>
+
+<form class="tool" method="post" action="{{ form_action }}" data-tool>
+  <fieldset class="options">
+    <legend class="visually-hidden">Cleaning options</legend>
+
+    <div class="option-group">
+      <span class="option-label" id="lb-label">Line breaks</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="lb-label">
+        {% for value, label in line_break_choices %}
+        <label class="segment">
+          <input type="radio" name="line_breaks" value="{{ value }}"{% if options.line_breaks == value %} checked{% endif %}>
+          <span>{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="option-group">
+      <label class="option-label" for="case">Letter case</label>
+      <div class="select">
+        <select id="case" name="case">
+          {% for value, label in case_choices %}
+          <option value="{{ value }}"{% if options.case == value %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="option-group option-flags">
+      <span class="option-label" id="flags-label">Clean up</span>
+      <div class="flags" role="group" aria-labelledby="flags-label">
+        {% for value, label, hint in flag_choices %}
+        <label class="flag" title="{{ hint }}">
+          <input type="checkbox" name="flags" value="{{ value }}"{% if value in options.flags %} checked{% endif %}>
+          <span>{{ label }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  </fieldset>
+
+  {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+  <div class="panes">
+    <div class="pane">
+      <div class="pane-head">
+        <label for="input">Your text</label>
+        <button class="link-button" type="button" data-action="clear">Clear</button>
+      </div>
+      <textarea id="input" name="text" spellcheck="false" autocomplete="off" autocapitalize="off"
+        maxlength="{{ max_chars }}" placeholder="Paste or type your text here" data-input>{{ text }}</textarea>
+      <p class="pane-foot" data-stats="before">
+        <span>{% include "tools/_delta.html" with label="character" a=before.characters b=before.characters %}</span>
+        <span>{% include "tools/_delta.html" with label="word" a=before.words b=before.words %}</span>
+        <span>{% include "tools/_delta.html" with label="line" a=before.lines b=before.lines %}</span>
+      </p>
+    </div>
+
+    <div class="pane pane-output">
+      <div class="pane-head">
+        <label for="output">Clean text</label>
+        <div class="pane-actions">
+          <button class="button button-primary" type="button" data-action="copy">Copy</button>
+          <button class="button" type="button" data-action="download">Download .txt</button>
+        </div>
+      </div>
+      <textarea id="output" readonly spellcheck="false" placeholder="Your clean text appears here" data-output>{{ output }}</textarea>
+      <p class="pane-foot changes" data-stats="after" aria-live="polite">
+        {% if after %}
+        <span>{% include "tools/_delta.html" with label="character" a=before.characters b=after.characters %}</span>
+        <span>{% include "tools/_delta.html" with label="word" a=before.words b=after.words %}</span>
+        <span>{% include "tools/_delta.html" with label="line" a=before.lines b=after.lines %}</span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <button class="button button-primary" type="submit" data-submit>Clean text</button>
+    <p class="privacy-note">
+      <span class="js-only">Your text stays in your browser. Nothing is uploaded or saved.</span>
+      <span class="no-js-only">JavaScript is off, so your text is sent to our server to be cleaned. It is never saved or logged.</span>
+    </p>
+  </div>
+  <p class="toast" role="status" aria-live="polite" data-toast></p>
+</form>
+
+<section class="tool-list" id="tools" aria-labelledby="tools-heading">
+  <h2 id="tools-heading">{% if is_home %}One-click tools{% else %}More tools{% endif %}</h2>
+  <ul>
+    {% for t in tools %}{% if t.slug != tool.slug %}
+    <li>
+      <a href="{% url 'tool' t.slug %}">
+        <strong>{{ t.name }}</strong>
+        <span>{{ t.summary }}</span>
+      </a>
+    </li>
+    {% endif %}{% endfor %}
+  </ul>
+</section>
+
+<section class="how" aria-labelledby="how-heading">
+  <h2 id="how-heading">How to use it</h2>
+  <ol>
+    <li><strong>Paste your text</strong> into the box on the left. You can also type or edit it there.</li>
+    <li><strong>Choose what to fix.</strong> The clean version updates as you change the options.</li>
+    <li><strong>Copy or download</strong> the result and paste it wherever you need it.</li>
+  </ol>
+</section>
+
+<section class="faq" aria-labelledby="faq-heading">
+  <h2 id="faq-heading">Questions</h2>
+  {% for question, answer in faqs %}
+  <details{% if forloop.first %} open{% endif %}>
+    <summary>{{ question }}</summary>
+    <p>{{ answer }}</p>
+  </details>
+  {% endfor %}
+</section>
+{% endblock %}
+
+{% block scripts %}<script type="module" src="{% asset 'js/app.js' %}"></script>{% endblock %}

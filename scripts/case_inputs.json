@@ -1,0 +1,22 @@
+[
+  {"name": "no options leaves text untouched", "input": "Hello,   World!\n\nSecond line.", "options": {}},
+  {"name": "windows and old mac line endings are normalised", "input": "one\r\ntwo\rthree", "options": {}},
+  {"name": "remove all line breaks", "input": "The quick brown\nfox jumps\n\nover the  \n  lazy dog.\n", "options": {"line_breaks": "remove"}},
+  {"name": "join lines but keep paragraphs (PDF copy)", "input": "This sentence was\nbroken across lines\nby the PDF.\n\nA second paragraph\nalso wrapped.\n\n\n\nThird.", "options": {"line_breaks": "paragraphs"}},
+  {"name": "paragraph split tolerates whitespace-only blank lines", "input": "First para\nline two\n   \t\nSecond para", "options": {"line_breaks": "paragraphs"}},
+  {"name": "remove extra spaces keeps line breaks", "input": "  too    many\tspaces  \nsecond\u00a0\u00a0 line ", "options": {"flags": ["remove_extra_spaces"]}},
+  {"name": "remove empty lines", "input": "a\n\n   \nb\n\nc", "options": {"flags": ["remove_empty_lines"]}},
+  {"name": "remove punctuation keeps symbols and apostrophe-free words", "input": "Hello, world! It's 50% off -- (really) \"great\"... $5 + tax?", "options": {"flags": ["remove_punctuation"]}},
+  {"name": "remove punctuation handles unicode quotes and dashes", "input": "“Smart” quotes — and ¿Qué tal? ¡Hola!", "options": {"flags": ["remove_punctuation"]}},
+  {"name": "remove invisible characters", "input": "zero\u200bwidth\u200c join\u200der\ufeff soft\u00adhyphen\u2060end", "options": {"flags": ["remove_invisible"]}},
+  {"name": "uppercase", "input": "Make me loud, straße!", "options": {"case": "upper"}},
+  {"name": "lowercase", "input": "QUIET Please, ÉCOLE", "options": {"case": "lower"}},
+  {"name": "title case", "input": "the QUICK brown fox's well-known (tale) of \"the end\"", "options": {"case": "title"}},
+  {"name": "title case across lines", "input": "first line here\nsecond LINE here", "options": {"case": "title"}},
+  {"name": "sentence case", "input": "HELLO THERE. how are you? i am fine! i'm great, thanks.\nnew line STARTS here", "options": {"case": "sentence"}},
+  {"name": "sentence case with leading quotes and spaces", "input": "  \"WHAT a day\" she said. (yes) it was.", "options": {"case": "sentence"}},
+  {"name": "full PDF clean-up preset", "input": "\ufeffThe  report   shows\nthat sales\u200b grew\n\n\nby 12 percent.\nThis is\n   great news.", "options": {"line_breaks": "paragraphs", "flags": ["remove_extra_spaces", "remove_invisible"]}},
+  {"name": "everything at once", "input": "  HELLO,   world!\n\nthis   IS a test...  \n", "options": {"line_breaks": "remove", "case": "sentence", "flags": ["remove_extra_spaces", "remove_empty_lines", "remove_punctuation", "remove_invisible"]}},
+  {"name": "empty input", "input": "", "options": {"line_breaks": "remove", "case": "title", "flags": ["remove_extra_spaces"]}},
+  {"name": "unknown option values are ignored", "input": "Keep Me", "options": {"line_breaks": "explode", "case": "shout", "flags": ["delete_everything"]}}
+]

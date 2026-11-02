@@ -1,0 +1,287 @@
+[
+  {
+    "name": "no options leaves text untouched",
+    "input": "Hello,   World!\n\nSecond line.",
+    "options": {},
+    "expected": "Hello,   World!\n\nSecond line.",
+    "stats": {
+      "characters": 29,
+      "words": 4,
+      "lines": 3
+    }
+  },
+  {
+    "name": "windows and old mac line endings are normalised",
+    "input": "one\r\ntwo\rthree",
+    "options": {},
+    "expected": "one\ntwo\nthree",
+    "stats": {
+      "characters": 13,
+      "words": 3,
+      "lines": 3
+    }
+  },
+  {
+    "name": "remove all line breaks",
+    "input": "The quick brown\nfox jumps\n\nover the  \n  lazy dog.\n",
+    "options": {
+      "line_breaks": "remove"
+    },
+    "expected": "The quick brown fox jumps over the lazy dog.",
+    "stats": {
+      "characters": 44,
+      "words": 9,
+      "lines": 1
+    }
+  },
+  {
+    "name": "join lines but keep paragraphs (PDF copy)",
+    "input": "This sentence was\nbroken across lines\nby the PDF.\n\nA second paragraph\nalso wrapped.\n\n\n\nThird.",
+    "options": {
+      "line_breaks": "paragraphs"
+    },
+    "expected": "This sentence was broken across lines by the PDF.\n\nA second paragraph also wrapped.\n\nThird.",
+    "stats": {
+      "characters": 91,
+      "words": 15,
+      "lines": 5
+    }
+  },
+  {
+    "name": "paragraph split tolerates whitespace-only blank lines",
+    "input": "First para\nline two\n   \t\nSecond para",
+    "options": {
+      "line_breaks": "paragraphs"
+    },
+    "expected": "First para line two\n\nSecond para",
+    "stats": {
+      "characters": 32,
+      "words": 6,
+      "lines": 3
+    }
+  },
+  {
+    "name": "remove extra spaces keeps line breaks",
+    "input": "  too    many\tspaces  \nsecond   line ",
+    "options": {
+      "flags": [
+        "remove_extra_spaces"
+      ]
+    },
+    "expected": "too many spaces\nsecond line",
+    "stats": {
+      "characters": 27,
+      "words": 5,
+      "lines": 2
+    }
+  },
+  {
+    "name": "remove empty lines",
+    "input": "a\n\n   \nb\n\nc",
+    "options": {
+      "flags": [
+        "remove_empty_lines"
+      ]
+    },
+    "expected": "a\nb\nc",
+    "stats": {
+      "characters": 5,
+      "words": 3,
+      "lines": 3
+    }
+  },
+  {
+    "name": "remove punctuation keeps symbols and apostrophe-free words",
+    "input": "Hello, world! It's 50% off -- (really) \"great\"... $5 + tax?",
+    "options": {
+      "flags": [
+        "remove_punctuation"
+      ]
+    },
+    "expected": "Hello world Its 50 off  really great $5 + tax",
+    "stats": {
+      "characters": 45,
+      "words": 10,
+      "lines": 1
+    }
+  },
+  {
+    "name": "remove punctuation handles unicode quotes and dashes",
+    "input": "“Smart” quotes — and ¿Qué tal? ¡Hola!",
+    "options": {
+      "flags": [
+        "remove_punctuation"
+      ]
+    },
+    "expected": "Smart quotes  and Qué tal Hola",
+    "stats": {
+      "characters": 30,
+      "words": 6,
+      "lines": 1
+    }
+  },
+  {
+    "name": "remove invisible characters",
+    "input": "zero​width‌ join‍er﻿ soft­hyphen⁠end",
+    "options": {
+      "flags": [
+        "remove_invisible"
+      ]
+    },
+    "expected": "zerowidth joiner softhyphenend",
+    "stats": {
+      "characters": 30,
+      "words": 3,
+      "lines": 1
+    }
+  },
+  {
+    "name": "uppercase",
+    "input": "Make me loud, straße!",
+    "options": {
+      "case": "upper"
+    },
+    "expected": "MAKE ME LOUD, STRASSE!",
+    "stats": {
+      "characters": 22,
+      "words": 4,
+      "lines": 1
+    }
+  },
+  {
+    "name": "lowercase",
+    "input": "QUIET Please, ÉCOLE",
+    "options": {
+      "case": "lower"
+    },
+    "expected": "quiet please, école",
+    "stats": {
+      "characters": 19,
+      "words": 3,
+      "lines": 1
+    }
+  },
+  {
+    "name": "title case",
+    "input": "the QUICK brown fox's well-known (tale) of \"the end\"",
+    "options": {
+      "case": "title"
+    },
+    "expected": "The Quick Brown Fox's Well-Known (Tale) Of \"The End\"",
+    "stats": {
+      "characters": 52,
+      "words": 9,
+      "lines": 1
+    }
+  },
+  {
+    "name": "title case across lines",
+    "input": "first line here\nsecond LINE here",
+    "options": {
+      "case": "title"
+    },
+    "expected": "First Line Here\nSecond Line Here",
+    "stats": {
+      "characters": 32,
+      "words": 6,
+      "lines": 2
+    }
+  },
+  {
+    "name": "sentence case",
+    "input": "HELLO THERE. how are you? i am fine! i'm great, thanks.\nnew line STARTS here",
+    "options": {
+      "case": "sentence"
+    },
+    "expected": "Hello there. How are you? I am fine! I'm great, thanks.\nNew line starts here",
+    "stats": {
+      "characters": 76,
+      "words": 15,
+      "lines": 2
+    }
+  },
+  {
+    "name": "sentence case with leading quotes and spaces",
+    "input": "  \"WHAT a day\" she said. (yes) it was.",
+    "options": {
+      "case": "sentence"
+    },
+    "expected": "  \"What a day\" she said. (Yes) it was.",
+    "stats": {
+      "characters": 38,
+      "words": 8,
+      "lines": 1
+    }
+  },
+  {
+    "name": "full PDF clean-up preset",
+    "input": "﻿The  report   shows\nthat sales​ grew\n\n\nby 12 percent.\nThis is\n   great news.",
+    "options": {
+      "line_breaks": "paragraphs",
+      "flags": [
+        "remove_extra_spaces",
+        "remove_invisible"
+      ]
+    },
+    "expected": "The report shows that sales grew\n\nby 12 percent. This is great news.",
+    "stats": {
+      "characters": 68,
+      "words": 13,
+      "lines": 3
+    }
+  },
+  {
+    "name": "everything at once",
+    "input": "  HELLO,   world!\n\nthis   IS a test...  \n",
+    "options": {
+      "line_breaks": "remove",
+      "case": "sentence",
+      "flags": [
+        "remove_extra_spaces",
+        "remove_empty_lines",
+        "remove_punctuation",
+        "remove_invisible"
+      ]
+    },
+    "expected": "Hello world this is a test",
+    "stats": {
+      "characters": 26,
+      "words": 6,
+      "lines": 1
+    }
+  },
+  {
+    "name": "empty input",
+    "input": "",
+    "options": {
+      "line_breaks": "remove",
+      "case": "title",
+      "flags": [
+        "remove_extra_spaces"
+      ]
+    },
+    "expected": "",
+    "stats": {
+      "characters": 0,
+      "words": 0,
+      "lines": 0
+    }
+  },
+  {
+    "name": "unknown option values are ignored",
+    "input": "Keep Me",
+    "options": {
+      "line_breaks": "explode",
+      "case": "shout",
+      "flags": [
+        "delete_everything"
+      ]
+    },
+    "expected": "Keep Me",
+    "stats": {
+      "characters": 7,
+      "words": 2,
+      "lines": 1
+    }
+  }
+]

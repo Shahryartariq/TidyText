@@ -1,0 +1,14 @@
+.venv
+.git
+.github
+staticfiles
+tests
+scripts
+tools/tests
+Dockerfile
+docker-compose.yml
+.dockerignore
+Makefile
+*.md
+!README.md
+docs

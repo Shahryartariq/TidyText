@@ -1,67 +1,26 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends "base.html" %}
 
-    <link rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+{% block title %}About TidyText{% endblock %}
+{% block description %}TidyText is a free, private tool for cleaning up messy text: line breaks, extra spaces, invisible characters and letter case.{% endblock %}
+{% block og_title %}About TidyText{% endblock %}
 
-    <title>About Us - TextUtils</title>
-</head>
+{% block content %}
+<article class="prose">
+  <h1>About {{ app_name }}</h1>
+  <p class="lede">{{ app_name }} fixes the small, annoying problems text picks up when you copy it from one place to another.</p>
 
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">TextUtils</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarNavDropdown">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+  <h2>Why it exists</h2>
+  <p>Text copied from a PDF breaks at the end of every printed line. Text from a web page brings hidden characters and odd spaces. Text typed with caps lock on needs retyping. Each fix takes seconds here, without installing anything or signing up.</p>
 
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/about">About Us</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+  <h2>What makes it different</h2>
+  <ul>
+    <li><strong>Private by design.</strong> Your text is cleaned in your browser and never uploaded. There are no accounts, cookies or trackers.</li>
+    <li><strong>Instant.</strong> The result updates as you type or change an option.</li>
+    <li><strong>Honest about changes.</strong> You see exactly how many characters, words and lines were removed.</li>
+    <li><strong>Works everywhere.</strong> On phones, tablets and computers, with or without JavaScript.</li>
+  </ul>
 
-    <!-- About Section -->
-    <div class="container mt-4">
-        <h1>About TextUtils</h1>
-        <p class="lead">
-            TextUtils is a simple web application that helps you quickly
-            modify and analyze your text.
-        </p>
-
-        <hr>
-
-        <h3>What You Can Do</h3>
-        <ul>
-            <li>Remove punctuations from text</li>
-            <li>Convert text to UPPERCASE</li>
-            <li>Remove extra spaces</li>
-            <li>Remove new lines</li>
-        </ul>
-
-        <h3>Our Goal</h3>
-        <p>
-            Our goal is to provide an easy and fast tool for students,
-            developers, and writers to clean and format their text instantly.
-        </p>
-
-        <h3>Developer</h3>
-        <p>
-            This project is built using <strong>Django</strong> and
-            <strong>Bootstrap</strong> to demonstrate simple text processing
-            utilities in a web application.
-        </p>
-    </div>
-
-</body>
-</html>
+  <h2>Who made it</h2>
+  <p>{{ app_name }} is built and maintained by <a href="https://github.com/Shahryartariq" rel="noopener">Muhammad Shehryar</a>, a full-stack developer. Found a problem or have an idea for a tool? <a href="https://github.com/Shahryartariq" rel="noopener">Get in touch on GitHub</a>.</p>
+</article>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy | TidyText{% endblock %}
+{% block description %}TidyText doesn't store your text, set cookies or track you. Read exactly what happens to your data.{% endblock %}
+{% block og_title %}Privacy Policy | TidyText{% endblock %}
+
+{% block content %}
+<article class="prose">
+  <h1>Privacy policy</h1>
+  <p class="lede">Short version: your text is yours. {{ app_name }} doesn't store it, doesn't track you and doesn't use cookies.</p>
+
+  <h2>Your text</h2>
+  <p>With JavaScript turned on, which is the case for almost every browser, all cleaning happens on your own device. Your text is never sent to our servers.</p>
+  <p>If JavaScript is turned off, the text is sent to our server only to be cleaned and returned to you. It is not saved, logged or shared, and it is gone as soon as the page is sent back.</p>
+
+  <h2>Cookies and tracking</h2>
+  <p>{{ app_name }} sets no cookies and uses no analytics, advertising or tracking scripts. Your color theme choice is saved in your browser's local storage and never leaves your device.</p>
+
+  <h2>Server logs</h2>
+  <p>Like any website, our hosting provider records basic technical information about requests, such as the page address, time and IP address, to keep the service secure and running. These logs never contain the text you clean.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy? <a href="https://github.com/Shahryartariq" rel="noopener">Contact the developer on GitHub</a>.</p>
+</article>
+{% endblock %}
