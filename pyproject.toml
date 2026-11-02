@@ -6,6 +6,13 @@ readme = "README.md"
 license = "MIT"
 authors = [{ name = "Muhammad Shehryar" }]
 requires-python = ">=3.12"
+# Runtime dependencies. Vercel installs these from here; keep requirements.txt
+# (used by Docker) identical. tools/tests/test_packaging.py checks they match.
+dependencies = [
+    "Django==6.1.2",
+    "whitenoise==6.12.0",
+    "gunicorn==26.2.0",
+]
 
 [tool.ruff]
 line-length = 110
