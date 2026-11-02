@@ -139,7 +139,7 @@ class NewToolTests(SimpleTestCase):
 
     def test_find_and_replace_page_opens_the_panel_with_a_preset(self):
         response = self.client.get("/find-and-replace/")
-        self.assertContains(response, '<details class="option-group find-replace" open>')
+        self.assertContains(response, '<details class="find-replace" open>')
         self.assertContains(response, 'value="colour"')
         self.assertContains(response, "The color of the sky changes color at sunset.")
 

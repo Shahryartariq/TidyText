@@ -9,62 +9,68 @@
 {% block head %}<script type="application/ld+json">{{ structured_data }}</script>{% endblock %}
 
 {% block content %}
-{% if not is_home %}
-<nav class="breadcrumb" aria-label="Breadcrumb">
-  <a href="{% url 'home' %}">{{ app_name }}</a>
-  <span aria-hidden="true">/</span>
-  <span aria-current="page">{{ tool.name }}</span>
-</nav>
-{% endif %}
-
 <section class="intro">
+  {% if not is_home %}
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'home' %}">{{ app_name }}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ tool.name }}</span>
+  </nav>
+  {% endif %}
   <h1>{{ tool.heading }}</h1>
   <p class="lede">{{ tool.intro }}</p>
+  <ul class="trust" aria-label="Highlights">
+    <li>Free, no sign-up</li>
+    <li>Runs in your browser</li>
+    <li>Nothing is uploaded</li>
+  </ul>
 </section>
 
 <form class="tool" method="post" action="{{ form_action }}" data-tool>
-  <fieldset class="options">
+  <fieldset class="toolbar">
     <legend class="visually-hidden">Cleaning options</legend>
 
-    <div class="option-group">
-      <span class="option-label" id="lb-label">Line breaks</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lb-label">
-        {% for value, label in line_break_choices %}
-        <label class="segment">
-          <input type="radio" name="line_breaks" value="{{ value }}"{% if options.line_breaks == value %} checked{% endif %}>
-          <span>{{ label }}</span>
-        </label>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="option-group">
-      <label class="option-label" for="case">Letter case</label>
-      <div class="select">
-        <select id="case" name="case">
-          {% for value, label in case_choices %}
-          <option value="{{ value }}"{% if options.case == value %} selected{% endif %}>{{ label }}</option>
+    <div class="toolbar-row">
+      <div class="field">
+        <span class="field-label" id="lb-label">Line breaks</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="lb-label">
+          {% for value, label, hint in line_break_choices %}
+          <label class="segment" title="{{ hint }}">
+            <input type="radio" name="line_breaks" value="{{ value }}"{% if options.line_breaks == value %} checked{% endif %}>
+            <span>{{ label }}</span>
+          </label>
           {% endfor %}
-        </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="case">Letter case</label>
+        <div class="select">
+          <select id="case" name="case">
+            {% for value, label in case_choices %}
+            <option value="{{ value }}"{% if options.case == value %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="sort">Sort lines</label>
+        <div class="select">
+          <select id="sort" name="sort">
+            {% for value, label in sort_choices %}
+            <option value="{{ value }}"{% if options.sort == value %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
       </div>
     </div>
 
-    <div class="option-group">
-      <label class="option-label" for="sort">Sort lines</label>
-      <div class="select select-narrow">
-        <select id="sort" name="sort">
-          {% for value, label in sort_choices %}
-          <option value="{{ value }}"{% if options.sort == value %} selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-
-    <div class="option-group option-flags">
-      <span class="option-label" id="flags-label">Clean up</span>
-      <div class="flags" role="group" aria-labelledby="flags-label">
+    <div class="field">
+      <span class="field-label" id="flags-label">Clean up</span>
+      <div class="chips" role="group" aria-labelledby="flags-label">
         {% for value, label, hint in flag_choices %}
-        <label class="flag" title="{{ hint }}">
+        <label class="chip" title="{{ hint }}">
           <input type="checkbox" name="flags" value="{{ value }}"{% if value in options.flags %} checked{% endif %}>
           <span>{{ label }}</span>
         </label>
@@ -72,32 +78,32 @@
       </div>
     </div>
 
-    <details class="option-group find-replace"{% if show_find %} open{% endif %}>
+    <details class="find-replace"{% if show_find %} open{% endif %}>
       <summary>Find and replace</summary>
       <div class="find-fields">
         <label>
-          <span class="option-label">Find</span>
+          <span class="field-label">Find</span>
           <input type="text" name="find" value="{{ options.find }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Text to find" data-find>
         </label>
         <label>
-          <span class="option-label">Replace with</span>
+          <span class="field-label">Replace with</span>
           <input type="text" name="replace" value="{{ options.replace }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Leave empty to delete">
         </label>
-        <p class="hint">Matches exact text and capital letters. Type <code>\n</code> for a new line or <code>\t</code> for a tab. Runs first, on your original text.</p>
+        <p class="hint">Matches exact text and capital letters. Type <code>\n</code> for a new line or <code>\t</code> for a tab.</p>
       </div>
     </details>
   </fieldset>
 
   {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
 
-  <div class="panes">
+  <div class="editor">
     <div class="pane">
       <div class="pane-head">
         <label for="input">Your text</label>
         <div class="pane-actions">
-          <button class="link-button js-only" type="button" data-action="paste">Paste</button>
-          <button class="link-button js-only" type="button" data-action="open">Open file</button>
-          <button class="link-button" type="button" data-action="clear">Clear</button>
+          <button class="ghost js-only" type="button" data-action="paste">Paste</button>
+          <button class="ghost js-only" type="button" data-action="open">Open file</button>
+          <button class="ghost" type="button" data-action="clear">Clear</button>
           <input class="visually-hidden" type="file" accept=".txt,.md,.csv,.tsv,.html,.htm,.json,.log,.srt,.xml,text/*" tabindex="-1" aria-hidden="true" data-file>
         </div>
       </div>
@@ -114,8 +120,8 @@
       <div class="pane-head">
         <label for="output">Clean text</label>
         <div class="pane-actions">
+          <button class="ghost" type="button" data-action="download">Download</button>
           <button class="button button-primary" type="button" data-action="copy">Copy</button>
-          <button class="button" type="button" data-action="download">Download .txt</button>
         </div>
       </div>
       <textarea id="output" readonly spellcheck="false" placeholder="Your clean text appears here" data-output>{{ output }}</textarea>
@@ -129,33 +135,30 @@
     </div>
   </div>
 
-  <details class="more-stats"{% if show_details %} open{% endif %}>
-    <summary>Word count and reading time</summary>
-    <dl class="stat-grid" data-details>
-      <div><dt>Words</dt><dd data-detail="words">{{ shown.words|num }}</dd></div>
-      <div><dt>Characters</dt><dd data-detail="characters">{{ shown.characters|num }}</dd></div>
-      <div><dt>Characters without spaces</dt><dd data-detail="characters_no_spaces">{{ details.characters_no_spaces|num }}</dd></div>
-      <div><dt>Sentences</dt><dd data-detail="sentences">{{ details.sentences|num }}</dd></div>
-      <div><dt>Paragraphs</dt><dd data-detail="paragraphs">{{ details.paragraphs|num }}</dd></div>
-      <div><dt>Lines</dt><dd data-detail="lines">{{ shown.lines|num }}</dd></div>
-      <div><dt>Reading time</dt><dd data-detail="reading_seconds">{{ details.reading_seconds|duration }}</dd></div>
-      <div><dt>Speaking time</dt><dd data-detail="speaking_seconds">{{ details.speaking_seconds|duration }}</dd></div>
-    </dl>
-    <p class="hint">Counts are for the clean text. Reading time assumes 238 words per minute, speaking time 150.</p>
-  </details>
-
   <div class="submit-row">
     <button class="button button-primary" type="submit" data-submit>Clean text</button>
-    <p class="privacy-note">
-      <span class="js-only">Your text stays in your browser. Nothing is uploaded or saved.</span>
-      <span class="no-js-only">JavaScript is off, so your text is sent to our server to be cleaned. It is never saved or logged.</span>
-    </p>
+    <p class="no-js-only privacy-note">JavaScript is off, so your text is sent to our server to be cleaned. It is never saved or logged.</p>
   </div>
   <p class="toast" role="status" aria-live="polite" data-toast></p>
 </form>
 
-<section class="tool-list" id="tools" aria-labelledby="tools-heading">
-  <h2 id="tools-heading">{% if is_home %}One-click tools{% else %}More tools{% endif %}</h2>
+<details class="more-stats"{% if show_details %} open{% endif %}>
+  <summary>Word count and reading time</summary>
+  <dl class="stat-grid" data-details>
+    <div><dt>Words</dt><dd data-detail="words">{{ shown.words|num }}</dd></div>
+    <div><dt>Characters</dt><dd data-detail="characters">{{ shown.characters|num }}</dd></div>
+    <div><dt>Without spaces</dt><dd data-detail="characters_no_spaces">{{ details.characters_no_spaces|num }}</dd></div>
+    <div><dt>Sentences</dt><dd data-detail="sentences">{{ details.sentences|num }}</dd></div>
+    <div><dt>Paragraphs</dt><dd data-detail="paragraphs">{{ details.paragraphs|num }}</dd></div>
+    <div><dt>Lines</dt><dd data-detail="lines">{{ shown.lines|num }}</dd></div>
+    <div><dt>Reading time</dt><dd data-detail="reading_seconds">{{ details.reading_seconds|duration }}</dd></div>
+    <div><dt>Speaking time</dt><dd data-detail="speaking_seconds">{{ details.speaking_seconds|duration }}</dd></div>
+  </dl>
+  <p class="hint">Counts are for the clean text. Reading time assumes 238 words per minute, speaking time 150.</p>
+</details>
+
+<section class="section tool-list" id="tools" aria-labelledby="tools-heading">
+  <h2 id="tools-heading">{% if is_home %}All tools{% else %}More tools{% endif %}</h2>
   <ul>
     {% for t in tools %}{% if t.slug != tool.slug %}
     <li>
@@ -168,16 +171,16 @@
   </ul>
 </section>
 
-<section class="how" aria-labelledby="how-heading">
-  <h2 id="how-heading">How to use it</h2>
+<section class="section how" aria-labelledby="how-heading">
+  <h2 id="how-heading">How it works</h2>
   <ol>
-    <li><strong>Paste your text</strong> into the box on the left. You can also type or edit it there.</li>
-    <li><strong>Choose what to fix.</strong> The clean version updates as you change the options.</li>
-    <li><strong>Copy or download</strong> the result and paste it wherever you need it.</li>
+    <li><strong>Paste your text</strong><span>Type, paste, open a file or drop one on the box.</span></li>
+    <li><strong>Choose what to fix</strong><span>The clean version updates instantly as you change options.</span></li>
+    <li><strong>Copy the result</strong><span>Copy it to your clipboard or download it as a text file.</span></li>
   </ol>
 </section>
 
-<section class="faq" aria-labelledby="faq-heading">
+<section class="section faq" aria-labelledby="faq-heading">
   <h2 id="faq-heading">Questions</h2>
   {% for question, answer in faqs %}
   <details{% if forloop.first %} open{% endif %}>

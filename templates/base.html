@@ -8,8 +8,8 @@
   <link rel="canonical" href="{{ canonical_url }}">
   <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#F4F7F3" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0F1A21" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0D1117" media="(prefers-color-scheme: dark)">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ app_name }}">
@@ -50,9 +50,13 @@
       <nav class="site-nav" aria-label="Main">
         <a href="{% url 'home' %}#tools">Tools</a>
         <a href="{% url 'about' %}">About</a>
+        <a class="nav-source" href="https://github.com/Shahryartariq/django-text-formatter" rel="noopener">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          <span>Source</span>
+        </a>
         <button class="theme-toggle" type="button" data-theme-toggle aria-label="Change color theme">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 9 9A7 7 0 0 1 12 3Z" fill="currentColor"/></svg>
-          <span data-theme-label>Auto</span>
+          <span class="visually-hidden" data-theme-label>Auto</span>
         </button>
       </nav>
     </div>
@@ -65,7 +69,13 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <div class="footer-brand">
-        <strong>{{ app_name }}</strong>
+        <a class="brand" href="{% url 'home' %}">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+            <rect width="32" height="32" rx="8" fill="currentColor"/>
+            <path d="M8 10.5h16M8 16h16M8 21.5h9" stroke="var(--mark-lines)" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <span>{{ app_name }}</span>
+        </a>
         <p>{% if analytics_enabled %}Clean text in your browser. No sign-up, and your text is never stored.{% else %}Clean text in your browser. No sign-up, no tracking, nothing stored.{% endif %}</p>
       </div>
       <nav class="footer-links" aria-label="All tools">
@@ -75,15 +85,18 @@
         </ul>
       </nav>
       <nav class="footer-links" aria-label="About">
-        <h2>{{ app_name }}</h2>
+        <h2>Project</h2>
         <ul>
           <li><a href="{% url 'about' %}">About</a></li>
           <li><a href="{% url 'privacy' %}">Privacy</a></li>
-          <li><a href="https://github.com/Shahryartariq" rel="noopener">Made by Muhammad Shehryar</a></li>
+          <li><a href="https://github.com/Shahryartariq/django-text-formatter" rel="noopener">Source code</a></li>
         </ul>
       </nav>
     </div>
-    <p class="wrap footer-meta">Version {{ app_version }}</p>
+    <div class="wrap footer-meta">
+      <span>Built by <a href="https://github.com/Shahryartariq" rel="noopener">Muhammad Shehryar</a> with Django and vanilla JavaScript.</span>
+      <span>Version {{ app_version }}</span>
+    </div>
   </footer>
 
   {% block scripts %}{% endblock %}
