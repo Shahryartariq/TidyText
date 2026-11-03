@@ -43,6 +43,7 @@ Fix broken line breaks from PDFs, extra spaces, duplicate lines, invisible chara
 - [SEO](#seo)
 - [Project structure](#project-structure)
 - [Adding a tool](#adding-a-tool)
+- [Roadmap](#roadmap)
 - [License](#license)
 
 ## What TidyText does
@@ -72,11 +73,14 @@ A highlighted counter shows exactly what changed, for example `1,240 characters 
 | Commas, quotes and dashes in the way | **Remove punctuation** (works in any language) |
 | A word needs changing everywhere | **Find and replace** (type `\n` for a new line) |
 | Caps lock was on | **Sentence case, lowercase, UPPERCASE, Title Case** |
+| "Your good", "dont", "better then" | **Fix grammar**: common South Asian English slips, only where the meaning is clear |
+| Wordy, stiff phrasing | **Paraphrase**: about 100 hand-checked rewrites ("is able to" becomes "can"), or **Paraphrase with AI**, an optional model that runs on your device |
+| Sounds like a robot wrote it | **Humanize**: plain words, contractions, then everyday slips ("you're good" becomes "your good") |
 | How long is this? | **Word counter**: words, characters, sentences, paragraphs, reading and speaking time |
 
 ## Features
 
-- **16 tools, one page.** Every option can be combined, and each tool also has its own landing page such as `/fix-pdf-line-breaks/`, `/word-counter/` and `/remove-duplicate-lines/`.
+- **19 tools, one page.** Every option can be combined, and each tool also has its own landing page such as `/fix-pdf-line-breaks/`, `/word-counter/`, `/paraphrasing-tool/` and `/ai-text-humanizer/`.
 - **Instant.** Cleaning runs in the browser as you type and stays responsive on long documents (up to 200,000 characters).
 - **Private.** Text and files are processed on your device. Nothing is uploaded, stored or logged.
 - **Works without JavaScript.** The same form falls back to the server, which runs an identical Python implementation.
@@ -126,8 +130,8 @@ flowchart LR
     C -. tested against .-> S
 ```
 
-- The transformations exist twice, once in Python and once in JavaScript, and both are tested against the **same 33 cases**. So the instant browser result and the no-JavaScript fallback always match.
-- Options run in a fixed order: find and replace, HTML removal, invisible characters, quotes, hyphenation, punctuation, line breaks, empty lines, spaces, duplicates, sorting, then letter case.
+- The transformations exist twice, once in Python and once in JavaScript, and both are tested against the **same 51 cases**. So the instant browser result and the no-JavaScript fallback always match.
+- Options run in a fixed order: find and replace, HTML removal, invisible characters, quotes, hyphenation, grammar fixes, paraphrase, humanize, punctuation, line breaks, empty lines, spaces, duplicates, sorting, then letter case.
 - Pages are identical for every visitor (no cookies), so Vercel's CDN caches them. Most visits never reach Django.
 
 ## Getting started
@@ -238,11 +242,11 @@ Only page views are sent. The text people clean never goes to Google. If you hav
 ## Security and privacy
 
 - **No stored data:** no database, no uploads, no accounts, no sessions. Gunicorn logs paths only, never request bodies.
-- **Strict Content-Security-Policy** with no inline scripts or styles, plus HSTS, `X-Frame-Options: DENY`, `nosniff`, Referrer-Policy, COOP, CORP and a restrictive Permissions-Policy.
+- **Strict Content-Security-Policy** with no inline scripts or styles (the two pages with Paraphrase with AI also let its worker load the model runtime from jsDelivr), plus HSTS, `X-Frame-Options: DENY`, `nosniff`, Referrer-Policy, COOP, CORP and a restrictive Permissions-Policy.
 - **Safe output:** user text is always escaped, never rendered as HTML.
 - **Limits:** 200,000 characters per request, 1 MB request bodies, 5 MB files (read locally).
 - **Secrets from the environment:** the app refuses to start in production without a secret key.
-- **Small attack surface:** three runtime dependencies, no admin panel, no third-party scripts unless analytics is turned on.
+- **Small attack surface:** three runtime dependencies, no admin panel, no third-party scripts unless analytics is turned on or a visitor clicks Paraphrase with AI (which loads Transformers.js from jsDelivr into a worker and the model from Hugging Face; the text stays on the device).
 
 Details and how to report a problem: [SECURITY.md](SECURITY.md).
 
@@ -261,7 +265,7 @@ Details and how to report a problem: [SECURITY.md](SECURITY.md).
 ├── tidytext/               # Django project: settings, URLs, WSGI/ASGI
 ├── tools/
 │   ├── transforms.py       # Text transformations (pure Python)
-│   ├── catalog.py          # The 16 tools: presets, titles, page copy, FAQs
+│   ├── catalog.py          # The 19 tools: presets, titles, page copy, FAQs
 │   ├── views.py            # Pages, no-JS form fallback, robots.txt, health check
 │   ├── middleware.py       # Security and cache headers
 │   ├── sitemaps.py
@@ -287,6 +291,10 @@ Details and how to report a problem: [SECURITY.md](SECURITY.md).
 2. If it needs a new transformation, add it to both `tools/transforms.py` and `static/js/transforms.js`, add an example to `scripts/case_inputs.json`, then run `make cases` and `make test`.
 
 The page, sitemap entry, footer link and structured data are created automatically.
+
+## Roadmap
+
+What's done, what's next and what was ruled out (with reasons) is in [ROADMAP.md](ROADMAP.md).
 
 ## License
 

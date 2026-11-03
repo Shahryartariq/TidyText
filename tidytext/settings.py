@@ -194,6 +194,10 @@ SECURE_CSP = build_csp(
     https=ON_VERCEL or SECURE_SSL_REDIRECT or SITE_URL.startswith("https://"),
 )
 
+# Pages with "Paraphrase with AI" also let their worker load the model runtime from jsDelivr.
+# The worker can't touch the page, and the text never leaves the device.
+AI_PARAPHRASE_CSP = {**SECURE_CSP, "worker-src": [CSP.SELF, "https://cdn.jsdelivr.net"]}
+
 SILENCED_SYSTEM_CHECKS = [
     # No CSRF middleware by design (see MIDDLEWARE above): no cookies, sessions or accounts.
     "security.W003",

@@ -156,6 +156,24 @@ class NewToolTests(SimpleTestCase):
         )
         self.assertContains(response, ">apple\nkiwi\npear</textarea>")
 
+    def test_ai_paraphraser_is_offered_only_where_set(self):
+        for path in ("/paraphrasing-tool/", "/ai-text-humanizer/"):
+            with self.subTest(path):
+                response = self.client.get(path)
+                self.assertContains(response, "data-ai ")
+                self.assertContains(response, "js/ai-worker.js?v=")
+                csp = response["Content-Security-Policy"]
+                self.assertIn("worker-src 'self' https://cdn.jsdelivr.net", csp)
+        home = self.client.get("/")
+        self.assertNotContains(home, "data-ai ")
+        self.assertNotIn("jsdelivr", home["Content-Security-Policy"])
+
+    def test_paraphrase_runs_without_javascript(self):
+        response = self.client.post(
+            "/paraphrasing-tool/", {"text": "We are able to help.", "flags": ["paraphrase"]}
+        )
+        self.assertContains(response, ">We can help.</textarea>")
+
     def test_example_text_is_labelled_only_before_posting(self):
         self.assertContains(self.client.get("/"), "data-example-tag")
         self.assertNotContains(self.client.post("/", {"text": "Mine"}), "data-example-tag")

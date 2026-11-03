@@ -81,3 +81,58 @@ class TransformTests(SimpleTestCase):
 
     def test_stats_counts_windows_newlines_once(self):
         self.assertEqual(transforms.stats("a\r\nb").lines, 2)
+
+
+class HumanizeTests(SimpleTestCase):
+    def test_every_rule_is_in_a_shared_case(self):
+        # The shared cases are what keep the JavaScript tables in step with these.
+        inputs = {case["name"]: case["input"].split("\n") for case in CASES}
+        context = [
+            line
+            for word, (_, extra) in transforms.CONTEXT_FIXES.items()
+            for line in (
+                [f"{word} {n}" for n in transforms.SUBJECT_NEXT + extra]
+                + [f"{word} {a}." for a in transforms.PREDICATES]
+                + [f"{word} {a} to" for a in transforms.PREDICATES_BEFORE_TO]
+            )
+        ]
+        tables = {
+            "humanize covers every phrase": [
+                *transforms.FILLER_PHRASES,
+                *transforms.PLAIN_WORDS,
+                *transforms.CONTRACTIONS,
+                *transforms.SLIPS,
+                *transforms.SLIPS_BEFORE_WORD,
+            ],
+            "fix grammar covers every rule": [*transforms.GRAMMAR_FIXES, *context],
+            "paraphrase covers every phrase": list(transforms.PARAPHRASES),
+        }
+        for name, phrases in tables.items():
+            # Each line is a phrase followed by "word" (or "next words" after a filler phrase).
+            covered = {line.removesuffix(" next words").removesuffix(" word") for line in inputs[name]}
+            for phrase in phrases:
+                with self.subTest(phrase):
+                    self.assertIn(phrase, covered, f"add “{phrase}” to the “{name}” case and run make cases")
+
+    def test_contractions_wait_for_another_word(self):
+        self.assertEqual(transforms.humanize("Yes, they are. We are done."), "Yes, they are. We're done.")
+
+    def test_capitals_follow_the_original(self):
+        self.assertEqual(transforms.humanize("Utilize it. UTILIZE it."), "Use it. USE it.")
+
+    def test_humanize_adds_the_slips(self):
+        self.assertEqual(transforms.humanize("You're good. You are right."), "Your good. Your right.")
+
+    def test_fix_grammar_undoes_the_slips(self):
+        self.assertEqual(transforms.fix_grammar("Your good. Your right."), "You're good. You're right.")
+
+    def test_fix_grammar_leaves_possessives(self):
+        text = "Your good name, your right to vote, its tail and their house."
+        self.assertEqual(transforms.fix_grammar(text), text)
+
+    def test_paraphrase_keeps_capitals(self):
+        self.assertEqual(transforms.paraphrase("Purchase it. VERY TIRED."), "Buy it. EXHAUSTED.")
+
+    def test_fix_grammar_runs_before_humanize(self):
+        options = Options.build(flags=["humanize", "fix_grammar"])
+        self.assertEqual(transforms.apply("i dont know", options), "I dont know")

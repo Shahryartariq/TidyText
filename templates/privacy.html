@@ -14,6 +14,9 @@
   <p>If JavaScript is turned off, the text is sent to our server only to be cleaned and returned to you. It is not saved, logged or shared, and it is gone as soon as the page is sent back.</p>
   <p>Files you open or drop into {{ app_name }} are read by your browser on your device. They are never uploaded.</p>
 
+  <h2>Paraphrase with AI</h2>
+  <p>The optional AI paraphraser runs entirely on your device. When you first use it, your browser downloads the AI model from Hugging Face (huggingface.co) and the code that runs it from jsDelivr (cdn.jsdelivr.net), and keeps them in its cache. Those services see that a download happened, like any website visit, but never your text: it is processed on your device and never sent anywhere.</p>
+
   <h2>Cookies and analytics</h2>
   {% if analytics_enabled %}
   <p>We use Google Analytics to understand how many people visit and which tools are popular. It records pages visited, approximate location, device and browser type, and sets cookies to tell visits apart. It never receives the text you clean. Google processes this data under its <a href="https://policies.google.com/privacy" rel="noopener">privacy policy</a>, and you can opt out with the <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">Google Analytics opt-out add-on</a> or a content blocker.</p>

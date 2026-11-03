@@ -272,5 +272,170 @@
     "name": "unicode spaces count as word separators",
     "input": "one\u00a0two\u2003three\u3000four",
     "options": {}
+  },
+  {
+    "name": "humanize rewrites stiff phrases",
+    "input": "Furthermore, it is important to note that you are not alone. Many individuals utilize AI tools in order to write faster \u2014 and they are often better than they think. In conclusion, do not overthink it.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize never contracts at the end of a sentence",
+    "input": "I know what it is. Yes, you are. They will, and it is not.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize keeps capitals and curly apostrophes",
+    "input": "DO NOT utilize it. It\u2019s here, so we are right. Ensure the Robust plan works.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize drops filler and capitalises what follows",
+    "input": "It should be noted that results vary. Needless to say, we will see. Also, it is worth noting that most do.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize turns em dashes into commas",
+    "input": "word\u2014word and word \u2014 word\n\u2014 a line that starts with a dash",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize leaves words that only contain a phrase",
+    "input": "Thistle is notable. Ensurer. Delve intoxicating. Islands are not.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize adds everyday slips",
+    "input": "You're good. You are right that it is better than nothing. We will lose a lot in case of rain, at least for 2 years. Let's discuss it, as we discussed about it before. Don't cope with it every time.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize slips keep capitals and curly apostrophes",
+    "input": "YOU\u2019RE GOOD. It\u2019s fine, they\u2019re here. FOR 3 YEARS.",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar fixes your, its and their only when sure",
+    "input": "Your good. Your good name is known. your welcome to join, but your right to vote stays. Your going home? Its a nice day and its been fun, its tail is long. Their not coming to their house. YOUR RIGHT!",
+    "options": {
+      "flags": [
+        "fix_grammar"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar fixes common south asian slips",
+    "input": "i dont think im late. We discussed about the informations alot, its better then nothing. I could of come since 2 years. Dont loose hope, atleast reply back. Is it your's or their's? The app has it's own menu.",
+    "options": {
+      "flags": [
+        "fix_grammar"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar keeps curly apostrophes and i.e.",
+    "input": "i.e. youre right and your\u2019s is fine, i dont know",
+    "options": {
+      "flags": [
+        "fix_grammar"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar then humanize",
+    "input": "Your good and it is better then nothing.",
+    "options": {
+      "flags": [
+        "fix_grammar",
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "humanize covers every phrase",
+    "input": "it is important to note that next words\nit's important to note that next words\nit is worth noting that next words\nit's worth noting that next words\nit should be noted that next words\nneedless to say, next words\nin today's fast-paced world, next words\nin today's digital age, next words\nit is worth mentioning that next words\nit's worth mentioning that next words\ngenerally speaking, next words\nit goes without saying that next words\nit can be argued that next words\nas previously mentioned, next words\nfurthermore, word\nmoreover, word\nadditionally, word\nin conclusion, word\nin summary, word\nto summarize, word\ntherefore, word\nthus, word\nhence, word\ndelve into word\ndelves into word\ndelving into word\ndelved into word\nin order to word\ndue to the fact that word\nat this point in time word\nin the event that word\nwith regard to word\nwith regards to word\nprior to word\nin the realm of word\na myriad of word\na plethora of word\na wide range of word\na rich tapestry of word\nis a testament to word\nplays a crucial role in word\nplay a crucial role in word\nplays a pivotal role in word\nplay a pivotal role in word\nnavigate the complexities of word\nnavigating the complexities of word\nutilize word\nutilizes word\nutilized word\nutilizing word\nutilise word\nutilises word\nutilised word\nutilising word\nleveraging word\nfacilitate word\nfacilitates word\ncommence word\ncommences word\ncommenced word\nensure word\nensures word\nensuring word\nensured word\nnumerous word\nindividuals word\nsubsequently word\nseamless word\nseamlessly word\nrobust word\ncomprehensive word\nmake an assumption word\nhas the capacity to word\nhave the capacity to word\nwith respect to word\nsubsequent to word\nin light of the fact that word\nstands as a testament to word\nserves as a testament to word\nplays a vital role in word\nplay a vital role in word\nnestled in the heart of word\nin the heart of word\nrenowned for word\ndeeply rooted in word\nlet's dive into word\ndelve word\ndelves word\ndelving word\ndelved word\nstreamline word\nstreamlines word\nstreamlined word\ngarner word\ngarnered word\nmultifaceted word\nintricate word\nshowcases word\nshowcasing word\nunderscores word\npivotal word\nvibrant word\nbreathtaking word\ngroundbreaking word\ndo not word\ndoes not word\ndid not word\nis not word\nare not word\nwas not word\nwere not word\nhas not word\nhave not word\nwill not word\nwould not word\nshould not word\ncould not word\ncannot word\nit is word\nthat is word\nthere is word\nwhat is word\ni am word\nyou are word\nwe are word\nthey are word\ni will word\nyou will word\nwe will word\nthey will word\nyou're word\nit's word\nthey're word\nthan word\nlose word\nloses word\nlosing word\na lot word\nin front word\nat least word\nin case word\nas well word\neach other word\nevery time word\ncope with word\ndon't word\ndoesn't word\ndidn't word\ncan't word\nwon't word\nisn't word\naren't word\nwasn't word\nweren't word\nhaven't word\nhasn't word\nwouldn't word\nshouldn't word\ncouldn't word\ndiscuss word\ndiscussed word\ndiscussing word",
+    "options": {
+      "flags": [
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar covers every rule",
+    "input": "dont word\ndoesnt word\ndidnt word\ncant word\nwont word\nisnt word\narent word\nwasnt word\nwerent word\nhavent word\nhasnt word\nwouldnt word\nshouldnt word\ncouldnt word\nim word\nive word\nyoure word\ntheyre word\nthats word\nwhats word\nalot word\ninfront word\natleast word\nincase word\naswell word\neachother word\neverytime word\nloosing word\nlooses word\ndont loose word\ndon't loose word\nloose weight word\nto loose word\nwill loose word\nnot loose word\nnever loose word\ncan loose word\ncould loose word\nmight loose word\ncould of word\nwould of word\nshould of word\nmust of word\nmight of word\nyour's word\ntheir's word\nit's own word\ninformations word\nadvices word\nfurnitures word\nequipments word\nluggages word\nbaggages word\nsoftwares word\nfeedbacks word\nstuffs word\ndiscuss about word\ndiscussed about word\ndiscussing about word\nmention about word\ncope up with word\nreturn back word\nreply back word\nrevert back word\nexplain me word\nmore then word\nless then word\nrather then word\nother then word\nfewer then word\nbetter then word\nworse then word\ngreater then word\nlarger then word\nbigger then word\nsmaller then word\nhigher then word\nlower then word\nfaster then word\nslower then word\nlonger then word\nshorter then word\nolder then word\nyounger then word\neasier then word\nharder then word\ncheaper then word\nstronger then word\nearlier then word\nlater then word\nyour a\nyour an\nyour the\nyour not\nyour so\nyour too\nyour really\nyour just\nyour always\nyour never\nyour still\nyour also\nyour being\nyour going\nyour gonna\nyour doing\nyour getting\nyour making\nyour trying\nyour looking\nyour coming\nyour here\nyour there\nyour my\nyour such\nyour absolutely\nyour probably\nyour definitely\nyour actually\nyour good.\nyour great.\nyour fine.\nyour okay.\nyour ok.\nyour sure.\nyour right.\nyour wrong.\nyour welcome.\nyour late.\nyour early.\nyour beautiful.\nyour amazing.\nyour awesome.\nyour smart.\nyour crazy.\nyour lucky.\nyour done.\nyour ready.\nyour sorry.\nyour correct.\nyour free.\nyour busy.\nyour kind.\nyour funny.\nyour cute.\nyour safe.\nyour true.\nyour over.\nyour easy.\nyour hard.\nyour important.\nyour possible.\nyour clear.\nyour welcome to\nyour ready to\nyour free to\nyour sure to\nyour able to\nyour happy to\nyour lucky to\nyour kind to\nits a\nits an\nits the\nits not\nits so\nits too\nits really\nits just\nits always\nits never\nits still\nits also\nits being\nits going\nits gonna\nits doing\nits getting\nits making\nits trying\nits looking\nits coming\nits here\nits there\nits my\nits such\nits absolutely\nits probably\nits definitely\nits actually\nits been\nits raining\nits time\nits better\nits worse\nits good.\nits great.\nits fine.\nits okay.\nits ok.\nits sure.\nits right.\nits wrong.\nits welcome.\nits late.\nits early.\nits beautiful.\nits amazing.\nits awesome.\nits smart.\nits crazy.\nits lucky.\nits done.\nits ready.\nits sorry.\nits correct.\nits free.\nits busy.\nits kind.\nits funny.\nits cute.\nits safe.\nits true.\nits over.\nits easy.\nits hard.\nits important.\nits possible.\nits clear.\nits welcome to\nits ready to\nits free to\nits sure to\nits able to\nits happy to\nits lucky to\nits kind to\ntheir a\ntheir an\ntheir the\ntheir not\ntheir so\ntheir too\ntheir really\ntheir just\ntheir always\ntheir never\ntheir still\ntheir also\ntheir being\ntheir going\ntheir gonna\ntheir doing\ntheir getting\ntheir making\ntheir trying\ntheir looking\ntheir coming\ntheir here\ntheir there\ntheir my\ntheir such\ntheir absolutely\ntheir probably\ntheir definitely\ntheir actually\ntheir good.\ntheir great.\ntheir fine.\ntheir okay.\ntheir ok.\ntheir sure.\ntheir right.\ntheir wrong.\ntheir welcome.\ntheir late.\ntheir early.\ntheir beautiful.\ntheir amazing.\ntheir awesome.\ntheir smart.\ntheir crazy.\ntheir lucky.\ntheir done.\ntheir ready.\ntheir sorry.\ntheir correct.\ntheir free.\ntheir busy.\ntheir kind.\ntheir funny.\ntheir cute.\ntheir safe.\ntheir true.\ntheir over.\ntheir easy.\ntheir hard.\ntheir important.\ntheir possible.\ntheir clear.\ntheir welcome to\ntheir ready to\ntheir free to\ntheir sure to\ntheir able to\ntheir happy to\ntheir lucky to\ntheir kind to",
+    "options": {
+      "flags": [
+        "fix_grammar"
+      ]
+    }
+  },
+  {
+    "name": "paraphrase rewrites wordy phrases",
+    "input": "First and foremost, the majority of users are able to purchase additional items on a daily basis. We made a decision. It is VERY IMPORTANT. As a result, we were able to assist them.",
+    "options": {
+      "flags": [
+        "paraphrase"
+      ]
+    }
+  },
+  {
+    "name": "paraphrase leaves words that only contain a phrase",
+    "input": "Purchasers modify nothing; unmodified, inquiries regarding residences stay.",
+    "options": {
+      "flags": [
+        "paraphrase"
+      ]
+    }
+  },
+  {
+    "name": "fix grammar, paraphrase and humanize together",
+    "input": "Your able to purchase alot. Furthermore, it is important to note that you are able to make a decision on a daily basis, and its better then waiting.",
+    "options": {
+      "flags": [
+        "fix_grammar",
+        "paraphrase",
+        "humanize"
+      ]
+    }
+  },
+  {
+    "name": "paraphrase covers every phrase",
+    "input": "is able to word\nare able to word\nwas able to word\nwere able to word\nyou're able to word\nwe're able to word\nthey're able to word\ni'm able to word\nhas the ability to word\nhave the ability to word\na large number of word\na great deal of word\na small number of word\nthe majority of word\na number of word\neach and every word\nfirst and foremost word\ndespite the fact that word\nin spite of the fact that word\nfor the purpose of word\nwith the exception of word\nin close proximity to word\nin the near future word\nat the present time word\nat the moment word\non a daily basis word\non a regular basis word\nas soon as possible word\nat the end of the day word\nin addition to word\nas a result of word\nas a result, word\nin light of word\nin other words, word\nfor example, word\nin fact, word\non the other hand, word\nit seems that word\nit is possible that word\nis in need of word\nare in need of word\nmake a decision word\nmakes a decision word\nmade a decision word\nmaking a decision word\ncome to the conclusion word\ncame to the conclusion word\ntake into account word\ntakes into account word\ntook into account word\ngive consideration to word\nhave a tendency to word\nhas a tendency to word\nmake an effort to word\nmakes an effort to word\nmade an effort to word\nin an effort to word\na lot of word\nvery big word\nvery small word\nvery good word\nvery bad word\nvery happy word\nvery tired word\nvery difficult word\nvery easy word\nvery important word\nvery quickly word\nvery hungry word\nvery cold word\nvery angry word\nvery scared word\nvery surprised word\npurchase word\npurchased word\npurchasing word\nassist word\nassists word\nassisted word\nassistance word\nobtain word\nobtains word\nobtained word\nsufficient word\napproximately word\ndemonstrate word\ndemonstrates word\ndemonstrated word\nadditional word\nfrequently word\noccasionally word\nimmediately word\ninquire word\ninquired word\nregarding word\npossess word\npossesses word\nterminate word\nterminated word\nmodify word\nmodifies word\nmodified word\nvisualize word\nresidence word",
+    "options": {
+      "flags": [
+        "paraphrase"
+      ]
+    }
   }
 ]

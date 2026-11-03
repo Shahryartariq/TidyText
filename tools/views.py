@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -40,6 +41,9 @@ FLAG_CHOICES = (
     ("straighten_quotes", "Smart quotes", "Turn curly quotes and long dashes into plain ones"),
     ("strip_html", "HTML tags", "Remove markup and keep the text"),
     ("remove_punctuation", "Punctuation", "Remove commas, periods, quotes and dashes"),
+    ("fix_grammar", "Fix grammar", "Fix common slips: your good → you're good, dont → don't"),
+    ("paraphrase", "Paraphrase", "Reword wordy phrases: is able to → can, very tired → exhausted"),
+    ("humanize", "Humanize", "Plain words, contractions and everyday slips: you're good → your good"),
 )
 
 
@@ -170,6 +174,8 @@ def tool_page(request: HttpRequest, slug: str = "") -> HttpResponse:
     )
     if request.method == "POST":
         response["Cache-Control"] = "no-store"
+    if tool.ai_paraphrase:
+        response._csp_config = settings.AI_PARAPHRASE_CSP
     return response
 
 

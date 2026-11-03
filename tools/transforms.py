@@ -25,6 +25,9 @@ FLAGS = (
     "straighten_quotes",
     "strip_html",
     "remove_punctuation",
+    "humanize",
+    "fix_grammar",
+    "paraphrase",
 )
 MAX_FIND_CHARS = 1000
 
@@ -69,6 +72,439 @@ _HTML_BREAK = re.compile(r"<br\s*/?>|</(?:p|div|li|h[1-6]|tr|blockquote|pre)\s*>
 _HTML_TAG = re.compile(r"</?[a-zA-Z][^>]*>")
 _HTML_ENTITY = re.compile(r"&(#\d{1,7}|#x[0-9a-f]{1,6}|nbsp|amp|lt|gt|quot|apos);", re.IGNORECASE)
 _NAMED_ENTITIES = {"nbsp": "\u00a0", "amp": "&", "lt": "<", "gt": ">", "quot": '"', "apos": "'"}
+
+# Humanize: phrases that make text sound stiff or machine-written. Keys are lowercase with
+# straight apostrophes; they match any capitalisation and either apostrophe.
+FILLER_PHRASES = (
+    "it is important to note that",
+    "it's important to note that",
+    "it is worth noting that",
+    "it's worth noting that",
+    "it should be noted that",
+    "needless to say,",
+    "in today's fast-paced world,",
+    "in today's digital age,",
+    # More from the MIT-licensed list at github.com/harshaneel/humanize (c) 2026 Harshaneel Gokhale.
+    "it is worth mentioning that",
+    "it's worth mentioning that",
+    "generally speaking,",
+    "it goes without saying that",
+    "it can be argued that",
+    "as previously mentioned,",
+)
+PLAIN_WORDS = {
+    "furthermore,": "also,",
+    "moreover,": "also,",
+    "additionally,": "also,",
+    "in conclusion,": "overall,",
+    "in summary,": "overall,",
+    "to summarize,": "overall,",
+    "therefore,": "so,",
+    "thus,": "so,",
+    "hence,": "so,",
+    "delve into": "look into",
+    "delves into": "looks into",
+    "delving into": "looking into",
+    "delved into": "looked into",
+    "in order to": "to",
+    "due to the fact that": "because",
+    "at this point in time": "now",
+    "in the event that": "if",
+    "with regard to": "about",
+    "with regards to": "about",
+    "prior to": "before",
+    "in the realm of": "in",
+    "a myriad of": "lots of",
+    "a plethora of": "plenty of",
+    "a wide range of": "lots of",
+    "a rich tapestry of": "a mix of",
+    "is a testament to": "shows",
+    "plays a crucial role in": "is key to",
+    "play a crucial role in": "are key to",
+    "plays a pivotal role in": "is key to",
+    "play a pivotal role in": "are key to",
+    "navigate the complexities of": "deal with",
+    "navigating the complexities of": "dealing with",
+    "utilize": "use",
+    "utilizes": "uses",
+    "utilized": "used",
+    "utilizing": "using",
+    "utilise": "use",
+    "utilises": "uses",
+    "utilised": "used",
+    "utilising": "using",
+    "leveraging": "using",
+    "facilitate": "help",
+    "facilitates": "helps",
+    "commence": "start",
+    "commences": "starts",
+    "commenced": "started",
+    "ensure": "make sure",
+    "ensures": "makes sure",
+    "ensuring": "making sure",
+    "ensured": "made sure",
+    "numerous": "many",
+    "individuals": "people",
+    "subsequently": "later",
+    "seamless": "smooth",
+    "seamlessly": "smoothly",
+    "robust": "strong",
+    "comprehensive": "thorough",
+    # More from the MIT-licensed list at github.com/harshaneel/humanize (c) 2026 Harshaneel Gokhale.
+    "make an assumption": "assume",
+    "has the capacity to": "can",
+    "have the capacity to": "can",
+    "with respect to": "about",
+    "subsequent to": "after",
+    "in light of the fact that": "since",
+    "stands as a testament to": "shows",
+    "serves as a testament to": "shows",
+    "plays a vital role in": "is key to",
+    "play a vital role in": "are key to",
+    "nestled in the heart of": "in",
+    "in the heart of": "in",
+    "renowned for": "known for",
+    "deeply rooted in": "rooted in",
+    "let's dive into": "let's look at",
+    "delve": "dig",
+    "delves": "digs",
+    "delving": "digging",
+    "delved": "dug",
+    "streamline": "simplify",
+    "streamlines": "simplifies",
+    "streamlined": "simplified",
+    "garner": "get",
+    "garnered": "got",
+    "multifaceted": "complex",
+    "intricate": "complex",
+    "showcases": "shows",
+    "showcasing": "showing",
+    "underscores": "shows",
+    "pivotal": "key",
+    "vibrant": "lively",
+    "breathtaking": "amazing",
+    "groundbreaking": "new",
+}
+# Only contracted before another word, so "I know what it is." stays correct.
+CONTRACTIONS = {
+    "do not": "don't",
+    "does not": "doesn't",
+    "did not": "didn't",
+    "is not": "isn't",
+    "are not": "aren't",
+    "was not": "wasn't",
+    "were not": "weren't",
+    "has not": "hasn't",
+    "have not": "haven't",
+    "will not": "won't",
+    "would not": "wouldn't",
+    "should not": "shouldn't",
+    "could not": "couldn't",
+    "cannot": "can't",
+    "it is": "it's",
+    "that is": "that's",
+    "there is": "there's",
+    "what is": "what's",
+    "i am": "I'm",
+    "you are": "you're",
+    "we are": "we're",
+    "they are": "they're",
+    "i will": "I'll",
+    "you will": "you'll",
+    "we will": "we'll",
+    "they will": "they'll",
+}
+# Humanize ends with the slips people make when typing fast, very common in South Asian
+# English. They run after the contractions, so "you are good" ends up as "your good".
+SLIPS = {
+    "you're": "your",
+    "it's": "its",
+    "they're": "their",
+    "than": "then",
+    "lose": "loose",
+    "loses": "looses",
+    "losing": "loosing",
+    "a lot": "alot",
+    "in front": "infront",
+    "at least": "atleast",
+    "in case": "incase",
+    "as well": "aswell",
+    "each other": "eachother",
+    "every time": "everytime",
+    "cope with": "cope up with",
+    "don't": "dont",
+    "doesn't": "doesnt",
+    "didn't": "didnt",
+    "can't": "cant",
+    "won't": "wont",
+    "isn't": "isnt",
+    "aren't": "arent",
+    "wasn't": "wasnt",
+    "weren't": "werent",
+    "haven't": "havent",
+    "hasn't": "hasnt",
+    "wouldn't": "wouldnt",
+    "shouldn't": "shouldnt",
+    "couldn't": "couldnt",
+}
+# Only before another word (that isn't already "about"): "discuss it" → "discuss about it".
+SLIPS_BEFORE_WORD = {
+    "discuss": "discuss about",
+    "discussed": "discussed about",
+    "discussing": "discussing about",
+}
+
+# Paraphrase: hand-checked rewrites that keep the meaning in any sentence. Whole phrases
+# where possible; single words only when they have one clear sense.
+PARAPHRASES = {
+    "is able to": "can",
+    "are able to": "can",
+    "was able to": "could",
+    "were able to": "could",
+    "you're able to": "you can",
+    "we're able to": "we can",
+    "they're able to": "they can",
+    "i'm able to": "I can",
+    "has the ability to": "can",
+    "have the ability to": "can",
+    "a large number of": "many",
+    "a great deal of": "much",
+    "a small number of": "a few",
+    "the majority of": "most",
+    "a number of": "several",
+    "each and every": "every",
+    "first and foremost": "first",
+    "despite the fact that": "although",
+    "in spite of the fact that": "although",
+    "for the purpose of": "for",
+    "with the exception of": "except",
+    "in close proximity to": "near",
+    "in the near future": "soon",
+    "at the present time": "now",
+    "at the moment": "right now",
+    "on a daily basis": "daily",
+    "on a regular basis": "regularly",
+    "as soon as possible": "right away",
+    "at the end of the day": "in the end",
+    "in addition to": "besides",
+    "as a result of": "because of",
+    "as a result,": "because of this,",
+    "in light of": "given",
+    "in other words,": "put simply,",
+    "for example,": "for instance,",
+    "in fact,": "actually,",
+    "on the other hand,": "then again,",
+    "it seems that": "it looks like",
+    "it is possible that": "maybe",
+    "is in need of": "needs",
+    "are in need of": "need",
+    "make a decision": "decide",
+    "makes a decision": "decides",
+    "made a decision": "decided",
+    "making a decision": "deciding",
+    "come to the conclusion": "conclude",
+    "came to the conclusion": "concluded",
+    "take into account": "consider",
+    "takes into account": "considers",
+    "took into account": "considered",
+    "give consideration to": "consider",
+    "have a tendency to": "tend to",
+    "has a tendency to": "tends to",
+    "make an effort to": "try to",
+    "makes an effort to": "tries to",
+    "made an effort to": "tried to",
+    "in an effort to": "to",
+    "a lot of": "plenty of",
+    "very big": "huge",
+    "very small": "tiny",
+    "very good": "excellent",
+    "very bad": "terrible",
+    "very happy": "delighted",
+    "very tired": "exhausted",
+    "very difficult": "tough",
+    "very easy": "simple",
+    "very important": "essential",
+    "very quickly": "rapidly",
+    "very hungry": "starving",
+    "very cold": "freezing",
+    "very angry": "furious",
+    "very scared": "terrified",
+    "very surprised": "amazed",
+    "purchase": "buy",
+    "purchased": "bought",
+    "purchasing": "buying",
+    "assist": "help",
+    "assists": "helps",
+    "assisted": "helped",
+    "assistance": "help",
+    "obtain": "get",
+    "obtains": "gets",
+    "obtained": "got",
+    "sufficient": "enough",
+    "approximately": "about",
+    "demonstrate": "show",
+    "demonstrates": "shows",
+    "demonstrated": "showed",
+    "additional": "extra",
+    "frequently": "often",
+    "occasionally": "sometimes",
+    "immediately": "right away",
+    "inquire": "ask",
+    "inquired": "asked",
+    "regarding": "about",
+    "possess": "have",
+    "possesses": "has",
+    "terminate": "end",
+    "terminated": "ended",
+    "modify": "change",
+    "modifies": "changes",
+    "modified": "changed",
+    "visualize": "picture",
+    "residence": "home",
+}
+
+# Fix grammar undoes those slips, and a few more.
+COMPARATIVES = (
+    "more", "less", "rather", "other", "fewer", "better", "worse", "greater", "larger", "bigger",
+    "smaller", "higher", "lower", "faster", "slower", "longer", "shorter", "older", "younger",
+    "easier", "harder", "cheaper", "stronger", "earlier", "later",
+)  # fmt: skip
+GRAMMAR_FIXES = {
+    "dont": "don't",
+    "doesnt": "doesn't",
+    "didnt": "didn't",
+    "cant": "can't",
+    "wont": "won't",
+    "isnt": "isn't",
+    "arent": "aren't",
+    "wasnt": "wasn't",
+    "werent": "weren't",
+    "havent": "haven't",
+    "hasnt": "hasn't",
+    "wouldnt": "wouldn't",
+    "shouldnt": "shouldn't",
+    "couldnt": "couldn't",
+    "im": "I'm",
+    "ive": "I've",
+    "youre": "you're",
+    "theyre": "they're",
+    "thats": "that's",
+    "whats": "what's",
+    "alot": "a lot",
+    "infront": "in front",
+    "atleast": "at least",
+    "incase": "in case",
+    "aswell": "as well",
+    "eachother": "each other",
+    "everytime": "every time",
+    "loosing": "losing",
+    "looses": "loses",
+    "dont loose": "don't lose",
+    "don't loose": "don't lose",
+    "loose weight": "lose weight",
+    "to loose": "to lose",
+    "will loose": "will lose",
+    "not loose": "not lose",
+    "never loose": "never lose",
+    "can loose": "can lose",
+    "could loose": "could lose",
+    "might loose": "might lose",
+    "could of": "could have",
+    "would of": "would have",
+    "should of": "should have",
+    "must of": "must have",
+    "might of": "might have",
+    "your's": "yours",
+    "their's": "theirs",
+    "it's own": "its own",
+    "informations": "information",
+    "advices": "advice",
+    "furnitures": "furniture",
+    "equipments": "equipment",
+    "luggages": "luggage",
+    "baggages": "baggage",
+    "softwares": "software",
+    "feedbacks": "feedback",
+    "stuffs": "stuff",
+    "discuss about": "discuss",
+    "discussed about": "discussed",
+    "discussing about": "discussing",
+    "mention about": "mention",
+    "cope up with": "cope with",
+    "return back": "return",
+    "reply back": "reply",
+    "revert back": "reply",
+    "explain me": "explain to me",
+    **{f"{word} then": f"{word} than" for word in COMPARATIVES},
+}
+# "your", "its" and "their" are right in "your car" but wrong in "your welcome", so these
+# change only before words that can't follow a possessive...
+SUBJECT_NEXT = (
+    "a", "an", "the", "not", "so", "too", "really", "just", "always", "never", "still", "also",
+    "being", "going", "gonna", "doing", "getting", "making", "trying", "looking", "coming",
+    "here", "there", "my", "such", "absolutely", "probably", "definitely", "actually",
+)  # fmt: skip
+# ...or before an adjective that ends the clause: "your good." but not "your good name".
+PREDICATES = (
+    "good", "great", "fine", "okay", "ok", "sure", "right", "wrong", "welcome", "late", "early",
+    "beautiful", "amazing", "awesome", "smart", "crazy", "lucky", "done", "ready", "sorry",
+    "correct", "free", "busy", "kind", "funny", "cute", "safe", "true", "over", "easy", "hard",
+    "important", "possible", "clear",
+)  # fmt: skip
+# "your welcome to join" needs fixing, "your right to vote" doesn't, so only these before "to".
+PREDICATES_BEFORE_TO = ("welcome", "ready", "free", "sure", "able", "happy", "lucky", "kind")
+CONTEXT_FIXES = {
+    "your": ("you're", ()),
+    "its": ("it's", ("been", "raining", "time", "better", "worse")),
+    "their": ("they're", ()),
+}
+_CLAUSE_END = (
+    rf"[ \t]*(?:[.,!?;:)\n]|(?![\s\S]))|[ \t]+(?:at|with|for|now|too|enough|already|though)(?!{_LETTER})"
+)
+# "since 2 years" (South Asian) and "for 2 years" (standard).
+_DURATION = (
+    r"[ \t]+(?:[0-9]+|a|an|one|two|three|four|five|six|seven|eight|nine|ten|many|several)"
+    rf"[ \t]+(?:year|month|week|day|hour)s?(?!{_LETTER})"
+)
+_PHRASE_SPACE = re.compile(r"[ \t]+")
+_EM_DASH = re.compile(r"(?<=[^ \t\n])[ \t]*\u2014[ \t]*(?=[^ \t\n])")
+
+
+def _phrases(phrases, tail: str = "") -> re.Pattern:
+    """One case-insensitive pattern for whole phrases, longest first, any apostrophe and spacing."""
+
+    def pattern(phrase: str) -> str:
+        return "[ \t]+".join(re.escape(word).replace("'", "['\u2019]") for word in phrase.split(" "))
+
+    body = "|".join(pattern(p) for p in sorted(phrases, key=len, reverse=True))
+    return re.compile(f"(?<!{_LETTER})(?:{body})(?!{_LETTER}){tail}", re.IGNORECASE)
+
+
+_FILLER = _phrases(FILLER_PHRASES, "[ \t]+(.?)")
+_PLAIN = _phrases(PLAIN_WORDS)
+_CONTRACTIBLE = _phrases(CONTRACTIONS, f"(?=[ \t]+{_LETTER})")
+_SLIPS = _phrases(SLIPS)
+_SLIPS_BEFORE_WORD = _phrases(SLIPS_BEFORE_WORD, f"(?=[ \t]+(?!about(?!{_LETTER})){_LETTER})")
+_FOR_DURATION = re.compile(f"(?<!{_LETTER})for(?={_DURATION})", re.IGNORECASE)
+_PARAPHRASES = _phrases(PARAPHRASES)
+_GRAMMAR_FIXES = _phrases(GRAMMAR_FIXES)
+_SINCE_DURATION = re.compile(f"(?<!{_LETTER})since(?={_DURATION})", re.IGNORECASE)
+
+
+def _context(word: str, extra_next: tuple[str, ...]) -> str:
+    nexts = "|".join(SUBJECT_NEXT + extra_next)
+    predicates = "|".join(PREDICATES)
+    before_to = "|".join(PREDICATES_BEFORE_TO)
+    return (
+        f"{word}(?=[ \t]+(?:(?:{nexts})(?!{_LETTER})|(?:{predicates})(?:{_CLAUSE_END})"
+        f"|(?:{before_to})[ \t]+to(?!{_LETTER})))"
+    )
+
+
+_CONTEXT_FIXES = re.compile(
+    f"(?<!{_LETTER})(?:{'|'.join(_context(w, extra) for w, (_, extra) in CONTEXT_FIXES.items())})",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -161,6 +597,63 @@ def remove_punctuation(text: str) -> str:
     return "".join(ch for ch in text if not unicodedata.category(ch).startswith("P"))
 
 
+def _phrase_key(match: str) -> str:
+    return _PHRASE_SPACE.sub(" ", match.lower()).replace("’", "'")
+
+
+def _match_case(source: str, replacement: str) -> str:
+    """Give the replacement the capitals of the text it replaces: Utilize → Use, DO NOT → DON'T."""
+    if source.isupper():
+        return replacement.upper()
+    if source[:1].isupper():
+        return replacement[:1].upper() + replacement[1:]
+    return replacement
+
+
+def _drop_filler(match: re.Match) -> str:
+    # The next sentence now starts where the filler did, so it takes over its capital.
+    return match.group(1).upper() if match.group(0)[:1].isupper() else match.group(1)
+
+
+def _apostrophe(text: str) -> str:
+    """Write new apostrophes the way the text already does."""
+    return "’" if "’" in text and "'" not in text else "'"
+
+
+def _swap(pattern: re.Pattern, table: dict[str, str], text: str, apostrophe: str = "'") -> str:
+    def replace(match: re.Match) -> str:
+        return _match_case(match.group(0), table[_phrase_key(match.group(0))]).replace("'", apostrophe)
+
+    return pattern.sub(replace, text)
+
+
+def humanize(text: str) -> str:
+    """Make text read like a person typed it: plain words, contractions, everyday slips."""
+    apostrophe = _apostrophe(text)
+    text = _FILLER.sub(_drop_filler, text)
+    text = _swap(_PLAIN, PLAIN_WORDS, text)
+    text = _swap(_CONTRACTIBLE, CONTRACTIONS, text, apostrophe)
+    text = _EM_DASH.sub(", ", text)
+    text = _swap(_SLIPS, SLIPS, text)
+    text = _swap(_SLIPS_BEFORE_WORD, SLIPS_BEFORE_WORD, text)
+    return _FOR_DURATION.sub(lambda m: _match_case(m.group(0), "since"), text)
+
+
+def paraphrase(text: str) -> str:
+    """Reword with hand-checked phrase rewrites: "is able to" → "can", "very tired" → "exhausted"."""
+    return _swap(_PARAPHRASES, PARAPHRASES, text)
+
+
+def fix_grammar(text: str) -> str:
+    """Fix common slips: your good → you're good, dont → don't, better then → better than."""
+    apostrophe = _apostrophe(text)
+    text = _swap(_GRAMMAR_FIXES, GRAMMAR_FIXES, text, apostrophe)
+    fixes = {word: replacement for word, (replacement, _) in CONTEXT_FIXES.items()}
+    text = _swap(_CONTEXT_FIXES, fixes, text, apostrophe)
+    text = _SINCE_DURATION.sub(lambda m: _match_case(m.group(0), "for"), text)
+    return _PRONOUN_I.sub("I", text)
+
+
 def _join_lines(text: str) -> str:
     return " ".join(line.strip() for line in text.split("\n") if line.strip())
 
@@ -245,6 +738,12 @@ def apply(text: str, options: Options) -> str:
         text = straighten_quotes(text)
     if "fix_hyphenation" in flags:
         text = fix_hyphenation(text)
+    if "fix_grammar" in flags:
+        text = fix_grammar(text)
+    if "paraphrase" in flags:
+        text = paraphrase(text)
+    if "humanize" in flags:
+        text = humanize(text)
     if "remove_punctuation" in flags:
         text = remove_punctuation(text)
     if options.line_breaks == "remove":
