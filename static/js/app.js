@@ -15,6 +15,10 @@ if (form) {
   const inputPane = input.closest(".pane");
   const toast = form.querySelector("[data-toast]");
   const errorBox = form.querySelector(".form-error");
+  const exampleTag = form.querySelector("[data-example-tag]");
+  const resetButton = form.querySelector('[data-action="reset"]');
+  const copyButton = form.querySelector('[data-action="copy"]');
+  const optionFields = [...form.querySelectorAll(".toolbar input, .toolbar select")];
   const fmt = new Intl.NumberFormat("en-US");
   const LABELS = ["characters", "words", "lines"];
 
@@ -74,16 +78,49 @@ if (form) {
     }
   };
 
+  // The page's own markup holds the tool's preset, so "changed" means "differs from the HTML".
+  const isChanged = (el) => {
+    if (el.tagName === "SELECT") return [...el.options].some((o) => o.selected !== o.defaultSelected);
+    if (el.type === "radio" || el.type === "checkbox") return el.checked !== el.defaultChecked;
+    return el.value !== el.defaultValue;
+  };
+
+  const resetOptions = () => {
+    for (const el of optionFields) {
+      if (el.tagName === "SELECT") for (const o of el.options) o.selected = o.defaultSelected;
+      else if (el.type === "radio" || el.type === "checkbox") el.checked = el.defaultChecked;
+      else el.value = el.defaultValue;
+    }
+    update();
+  };
+
+  // Nothing to fix was chosen (the word counter, say), so "already clean" would be misleading.
+  const isNoop = (o) =>
+    o.lineBreaks === "keep" && o.textCase === "keep" && o.sort === "keep" && !o.flags.length && !o.find;
+
   const update = () => {
     errorBox?.remove();
-    const cleaned = apply(input.value, readOptions());
+    const options = readOptions();
+    const cleaned = apply(input.value, options);
     output.value = cleaned;
     const a = stats(input.value);
     const b = stats(cleaned);
     renderStats(before, a, a);
     if (input.value === "") after.replaceChildren();
-    else renderStats(after, a, b);
+    else if (cleaned === input.value && !isNoop(options)) {
+      const note = Object.assign(document.createElement("span"), { className: "already-clean" });
+      note.textContent = "Already clean, nothing to change";
+      after.replaceChildren(note);
+    } else renderStats(after, a, b);
     renderDetails(cleaned, b);
+    if (resetButton) resetButton.hidden = !optionFields.some(isChanged);
+  };
+
+  // The page opens with example text. Once the visitor brings their own, drop the label.
+  let showingExample = Boolean(exampleTag);
+  const leaveExample = () => {
+    showingExample = false;
+    exampleTag?.remove();
   };
 
   // Very long text: wait until typing pauses so the page stays responsive.
@@ -94,21 +131,24 @@ if (form) {
     else update();
   };
 
+  // The toast doubles as the screen reader announcement; `quiet` announces without showing it.
   let toastTimer = 0;
-  const say = (message) => {
+  const say = (message, { quiet = false } = {}) => {
     toast.textContent = message;
-    toast.classList.add("is-visible");
+    toast.classList.toggle("is-visible", !quiet);
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2400);
   };
 
   const setInput = (text, message) => {
+    leaveExample();
     const trimmed = text.length > MAX_CHARS;
     input.value = trimmed ? text.slice(0, MAX_CHARS) : text;
     update();
     say(trimmed ? `Only the first ${fmt.format(MAX_CHARS)} characters were kept.` : message);
   };
 
+  let copyTimer = 0;
   const copy = async () => {
     if (!output.value) return say("Nothing to copy yet. Paste some text first.");
     try {
@@ -117,7 +157,14 @@ if (form) {
       output.select();
       document.execCommand("copy");
     }
-    say("Copied to clipboard");
+    say("Copied to clipboard", { quiet: true });
+    copyButton.textContent = "Copied";
+    copyButton.classList.add("is-done");
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => {
+      copyButton.textContent = "Copy";
+      copyButton.classList.remove("is-done");
+    }, 1600);
   };
 
   const paste = async () => {
@@ -143,6 +190,7 @@ if (form) {
   };
 
   const clear = () => {
+    leaveExample();
     input.value = "";
     update();
     input.focus();
@@ -166,7 +214,24 @@ if (form) {
     }
   };
 
-  input.addEventListener("input", schedule);
+  input.addEventListener("input", () => {
+    leaveExample();
+    schedule();
+  });
+  // Pasting over the untouched example replaces it, instead of mixing the two.
+  input.addEventListener("paste", (event) => {
+    const text = event.clipboardData?.getData("text/plain");
+    if (!showingExample || !text) return;
+    event.preventDefault();
+    setInput(text, "Replaced the example with your text");
+  });
+  // Ctrl+Enter (⌘+Enter on a Mac) copies the clean text from anywhere in the tool.
+  form.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      copy();
+    }
+  });
   form.addEventListener("input", (event) => {
     if (event.target.matches('input[type="text"]')) update();
   });
@@ -189,6 +254,7 @@ if (form) {
     else if (action === "open") fileInput.click();
     else if (action === "download") download();
     else if (action === "clear") clear();
+    else if (action === "reset") resetOptions();
   });
 
   // Drag and drop a text file onto the input box.

@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- The starting text is labelled "Example", and pasting over it replaces it instead of
+  mixing your text into it.
+- "Reset options" appears once you change the options, and returns to the page's preset.
+- "Already clean, nothing to change" when the chosen fixes leave the text as it was.
+- Ctrl+Enter (⌘+Enter on a Mac) copies the clean text; the Copy button shows "Copied".
+
+### Changed
+- A shorter intro so the editor starts higher on the screen.
+- The tool list is a grid of cards.
+
 ## [1.0.0] - 2026-11-02
 
 First production release. The tutorial "text formatter" is rebuilt as **TidyText**.

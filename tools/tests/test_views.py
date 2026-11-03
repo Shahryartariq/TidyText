@@ -156,6 +156,21 @@ class NewToolTests(SimpleTestCase):
         )
         self.assertContains(response, ">apple\nkiwi\npear</textarea>")
 
+    def test_example_text_is_labelled_only_before_posting(self):
+        self.assertContains(self.client.get("/"), "data-example-tag")
+        self.assertNotContains(self.client.post("/", {"text": "Mine"}), "data-example-tag")
+
+    def test_text_that_needs_no_changes_says_so(self):
+        response = self.client.post("/", {"text": "Already tidy.", "flags": ["remove_extra_spaces"]})
+        self.assertContains(response, "Already clean, nothing to change")
+        response = self.client.post("/", {"text": "tidy", "case": "upper"})
+        self.assertNotContains(response, "Already clean")
+
+    def test_no_options_shows_counts_not_already_clean(self):
+        response = self.client.get("/word-counter/")
+        self.assertNotContains(response, "Already clean")
+        self.assertContains(response, " words</span>")
+
     def test_post_strip_html_never_renders_markup(self):
         response = self.client.post("/", {"text": "<img src=x onerror=alert(1)>Hi", "flags": ["strip_html"]})
         self.assertContains(response, ">Hi</textarea>")
