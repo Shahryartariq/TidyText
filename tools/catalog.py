@@ -24,6 +24,7 @@ class Tool:
     faqs: tuple[tuple[str, str], ...] = field(default_factory=tuple)
     show_find: bool = False  # open the find and replace panel
     show_details: bool = False  # open the word count panel
+    ai_paraphrase: bool = False  # offer the optional in-browser AI paraphraser
 
 
 def _opts(line_breaks="keep", case="keep", *flags: str, sort="keep", find="", replace="") -> Options:
@@ -226,6 +227,144 @@ TOOLS: tuple[Tool, ...] = (
                 "Where do these characters come from?",
                 "Usually from copying text out of web pages, chat apps, PDFs or word "
                 "processors. They can break passwords, code, URLs and spreadsheet formulas.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="ai-text-humanizer",
+        name="AI text humanizer",
+        title="Free AI Text Humanizer: Make AI Writing Sound Human",
+        description=(
+            "Rewrite stiff, AI-sounding text so it reads like a person typed it: plain words, "
+            "contractions and everyday slips. Free, instant, and nothing is uploaded."
+        ),
+        heading="Make AI text sound human",
+        summary="Plain words, contractions and everyday slips.",
+        intro=(
+            "Paste text from ChatGPT or any AI writer. Stiff phrases become plain words, “you "
+            "are” becomes “you're”, and then the slips real people make: “your good”."
+        ),
+        options=_opts("keep", "keep", "humanize"),
+        ai_paraphrase=True,
+        example=(
+            "Furthermore, it is important to note that you are not alone. Many individuals "
+            "utilize AI tools in order to write faster — and they are often better than they "
+            "think. In conclusion, do not overthink it."
+        ),
+        faqs=(
+            (
+                "What does the humanizer change?",
+                "It drops filler such as “it is important to note that”, swaps stiff words for "
+                "plain ones (“utilize” becomes “use”, “furthermore” becomes “also”), uses "
+                "contractions and turns em dashes into commas.",
+            ),
+            (
+                "Why does it add grammar mistakes?",
+                "Perfect grammar is a sign of AI writing. People typing fast make small slips, "
+                "especially in South Asian English: “your” for “you're”, “its” for “it's”, "
+                "“then” for “than”, “dont”, “alot”, “discuss about it” and “since 2 years”. "
+                "The humanizer adds those. To go the other way, use Fix grammar.",
+            ),
+            (
+                "Will it get past AI detectors?",
+                "There's no guarantee. TidyText uses simple, predictable rules rather than "
+                "another AI, so it changes wording and tone but not the ideas or structure. "
+                "Read the result and add your own words.",
+            ),
+            (
+                "Is my text sent to an AI service?",
+                "No. The rules run in your browser, so your text never leaves your device and "
+                "there's nothing to pay for.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="paraphrasing-tool",
+        name="Paraphrasing tool",
+        title="Free Paraphrasing Tool: Reword Text Online, Private",
+        description=(
+            "Reword wordy text instantly with hand-checked rewrites, or rewrite every sentence "
+            "with an optional AI model that runs on your device. Free and private."
+        ),
+        heading="Paraphrase text",
+        summary="Reword text, with an optional on-device AI.",
+        intro=(
+            "Wordy phrases are reworded instantly: “is able to” becomes “can”. For a full "
+            "rewrite, use Paraphrase with AI, which runs a small model on your own device."
+        ),
+        options=_opts("keep", "keep", "paraphrase"),
+        example=(
+            "First and foremost, the majority of customers are able to purchase additional "
+            "items on a daily basis. As a result, we made a decision to assist them in the near "
+            "future."
+        ),
+        ai_paraphrase=True,
+        faqs=(
+            (
+                "What's the difference between the two paraphrasers?",
+                "The instant one rewrites about 100 wordy phrases and stiff words with "
+                "hand-checked alternatives, so it never changes your meaning, but it only touches "
+                "those phrases. Paraphrase with AI rewrites every sentence with a small language "
+                "model, so the changes are bigger, but check that it kept your meaning.",
+            ),
+            (
+                "Is my text sent anywhere when I use the AI?",
+                "No. The model is downloaded to your browser once (about 250 MB, then cached) and "
+                "runs on your device. Your text never leaves it.",
+            ),
+            (
+                "Which AI model is it?",
+                "chatgpt_paraphraser_on_T5_base by humarin, a T5 model trained for paraphrasing, "
+                "in the compressed version by Felladrin. It is released under an OpenRAIL "
+                "license, whose use restrictions apply: for example, don't use it to deceive, "
+                "harass or impersonate people, and say that AI-rewritten text is machine "
+                "generated where that matters.",
+            ),
+            (
+                "Can I paraphrase and humanize together?",
+                "Yes. Turn on Fix grammar, Paraphrase and Humanize together: grammar is fixed "
+                "first, then the text is paraphrased, then humanized.",
+            ),
+        ),
+    ),
+    Tool(
+        slug="grammar-fixer",
+        name="Grammar fixer",
+        title="Grammar Fixer: Fix Common Grammar Mistakes Free",
+        description=(
+            "Fix everyday grammar slips: “your good” to “you're good”, “its a” to “it's a”, "
+            "“better then” to “better than”, “dont” to “don't”. Free and private."
+        ),
+        heading="Fix common grammar mistakes",
+        summary="Your good → you're good, dont → don't.",
+        intro=(
+            "Fixes the small slips everyone makes when typing fast, especially in South Asian "
+            "English, from “your welcome” to “since 2 years”. It only changes what it's sure of."
+        ),
+        options=_opts("keep", "keep", "fix_grammar"),
+        example=(
+            "Your welcome! i dont think its a problem, your doing great. We discussed about "
+            "the informations alot. Its better then nothing and I could of come since 2 years."
+        ),
+        faqs=(
+            (
+                "What does it fix?",
+                "“your”, “its” and “their” when they should be “you're”, “it's” and "
+                "“they're”, “then” after a comparison (“better then”), missing apostrophes "
+                "(“dont”, “im”), joined words (“alot”, “atleast”, “infront”), “could of”, "
+                "“loose” for “lose”, plurals like “informations” and “advices”, and phrases "
+                "like “discuss about”, “cope up with” and “since 2 years”.",
+            ),
+            (
+                "Why didn't it change “your” in my sentence?",
+                "“your” is correct in “your good name”, so it only changes when the next words "
+                "make the meaning clear, as in “your good.”, “your not” or “your going”. It "
+                "leaves anything it isn't sure about, so check the rest yourself.",
+            ),
+            (
+                "Is this a full grammar checker?",
+                "No. It fixes a fixed list of very common slips with simple rules, in your "
+                "browser. It doesn't rewrite sentences or check spelling.",
             ),
         ),
     ),

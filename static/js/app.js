@@ -1,5 +1,7 @@
 // Instant, in-browser cleaning. The server only formats text when JavaScript is off.
-import { apply, details, stats } from "./transforms.js";
+// Load transforms.js with this file's ?v=<build id>, so a cached copy from an older deploy
+// can never run alongside the new page (it would silently ignore new options).
+const { apply, details, humanize, stats } = await import(`./transforms.js${new URL(import.meta.url).search}`);
 
 const MAX_CHARS = 200_000;
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -98,10 +100,27 @@ if (form) {
   const isNoop = (o) =>
     o.lineBreaks === "keep" && o.textCase === "keep" && o.sort === "keep" && !o.flags.length && !o.find;
 
+  // Paraphrase with AI (only on pages that offer it) stands in for the Paraphrase step: the
+  // other options run first, the model rewrites the result, then Humanize runs on top. It's
+  // kept until the text or those other options change.
+  const aiPanel = form.querySelector("[data-ai]");
+  const aiTag = form.querySelector("[data-ai-tag]");
+  const LATE_FLAGS = ["paraphrase", "humanize"];
+  const beforeAi = (options) => ({ ...options, flags: options.flags.filter((f) => !LATE_FLAGS.includes(f)) });
+  const aiKey = (options) => JSON.stringify([input.value, beforeAi(options)]);
+  let ai = null; // { key, text }
+
+  const clean = (options) => {
+    if (ai && ai.key !== aiKey(options)) ai = null;
+    if (aiTag) aiTag.hidden = !ai;
+    if (!ai) return apply(input.value, options);
+    return options.flags.includes("humanize") ? humanize(ai.text) : ai.text;
+  };
+
   const update = () => {
     errorBox?.remove();
     const options = readOptions();
-    const cleaned = apply(input.value, options);
+    const cleaned = clean(options);
     output.value = cleaned;
     const a = stats(input.value);
     const b = stats(cleaned);
@@ -214,6 +233,67 @@ if (form) {
     }
   };
 
+  let worker = null;
+  let aiRun = 0;
+  const aiButton = aiPanel?.querySelector('[data-action="ai"]');
+  const aiCancel = aiPanel?.querySelector('[data-action="ai-cancel"]');
+  const aiStatusBox = aiPanel?.querySelector("[data-ai-status-box]");
+  const aiProgress = aiPanel?.querySelector("[data-ai-progress]");
+  const aiStatus = aiPanel?.querySelector("[data-ai-status]");
+  const mb = (bytes) => `${fmt.format(Math.round(bytes / 1e6))} MB`;
+
+  const showAi = (message, { busy = true, fraction = null } = {}) => {
+    aiStatusBox.hidden = false;
+    aiStatus.textContent = message;
+    aiProgress.hidden = !busy;
+    if (fraction === null) aiProgress.removeAttribute("value");
+    else aiProgress.value = Math.round(fraction * 100);
+    aiButton.disabled = busy;
+    aiCancel.hidden = !busy;
+  };
+
+  const stopAi = () => {
+    worker?.terminate();
+    worker = null;
+    aiRun += 1;
+    showAi("Stopped. The downloaded part of the model is kept for next time.", { busy: false });
+  };
+
+  const runAi = () => {
+    if (!input.value.trim()) return say("Paste some text first.");
+    const options = readOptions();
+    const key = aiKey(options);
+    const run = ++aiRun;
+    worker ??= new Worker(aiPanel.dataset.worker, { type: "module" });
+    worker.onmessage = ({ data }) => {
+      if (run !== aiRun) return;
+      if (data.type === "status") showAi(data.text);
+      else if (data.type === "download")
+        showAi(`Downloading the AI model: ${mb(data.loaded)} of ${mb(data.total)}`, { fraction: data.loaded / data.total });
+      else if (data.type === "progress")
+        showAi(`Paraphrasing sentence ${data.done} of ${data.total}…`, { fraction: data.done / data.total });
+      else if (data.type === "error") showAi(`The AI couldn't finish: ${data.message}`, { busy: false });
+      else if (data.type === "result") {
+        if (key !== aiKey(readOptions())) {
+          showAi("Your text or options changed while the AI was working. Run it again.", { busy: false });
+          return;
+        }
+        ai = { key, text: data.text };
+        update();
+        showAi("Done. The AI result is shown until you change your text. AI output is machine generated.", {
+          busy: false,
+        });
+        say("Paraphrased with AI", { quiet: true });
+      }
+    };
+    worker.onerror = () => {
+      worker = null;
+      showAi("The AI couldn't start. Check your connection and try again.", { busy: false });
+    };
+    showAi("Starting the AI…");
+    worker.postMessage({ id: run, text: apply(input.value, beforeAi(options)) });
+  };
+
   input.addEventListener("input", () => {
     leaveExample();
     schedule();
@@ -255,6 +335,8 @@ if (form) {
     else if (action === "download") download();
     else if (action === "clear") clear();
     else if (action === "reset") resetOptions();
+    else if (action === "ai") runAi();
+    else if (action === "ai-cancel") stopAi();
   });
 
   // Drag and drop a text file onto the input box.
