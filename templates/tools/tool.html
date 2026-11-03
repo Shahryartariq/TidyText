@@ -78,20 +78,23 @@
       </div>
     </div>
 
-    <details class="find-replace"{% if show_find %} open{% endif %}>
-      <summary>Find and replace</summary>
-      <div class="find-fields">
-        <label>
-          <span class="field-label">Find</span>
-          <input type="text" name="find" value="{{ options.find }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Text to find" data-find>
-        </label>
-        <label>
-          <span class="field-label">Replace with</span>
-          <input type="text" name="replace" value="{{ options.replace }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Leave empty to delete">
-        </label>
-        <p class="hint">Matches exact text and capital letters. Type <code>\n</code> for a new line or <code>\t</code> for a tab.</p>
-      </div>
-    </details>
+    <div class="toolbar-foot">
+      <details class="find-replace"{% if show_find %} open{% endif %}>
+        <summary>Find and replace</summary>
+        <div class="find-fields">
+          <label>
+            <span class="field-label">Find</span>
+            <input type="text" name="find" value="{{ options.find }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Text to find" data-find>
+          </label>
+          <label>
+            <span class="field-label">Replace with</span>
+            <input type="text" name="replace" value="{{ options.replace }}" maxlength="1000" autocomplete="off" spellcheck="false" placeholder="Leave empty to delete">
+          </label>
+          <p class="hint">Matches exact text and capital letters. Type <code>\n</code> for a new line or <code>\t</code> for a tab.</p>
+        </div>
+      </details>
+      <button class="ghost reset" type="button" data-action="reset" hidden>Reset options</button>
+    </div>
   </fieldset>
 
   {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
@@ -99,7 +102,10 @@
   <div class="editor">
     <div class="pane">
       <div class="pane-head">
-        <label for="input">Your text</label>
+        <div class="pane-title">
+          <label for="input">Your text</label>
+          {% if is_example %}<span class="tag" data-example-tag title="Paste or type to replace it">Example</span>{% endif %}
+        </div>
         <div class="pane-actions">
           <button class="ghost js-only" type="button" data-action="paste">Paste</button>
           <button class="ghost js-only" type="button" data-action="open">Open file</button>
@@ -121,15 +127,19 @@
         <label for="output">Clean text</label>
         <div class="pane-actions">
           <button class="ghost" type="button" data-action="download">Download</button>
-          <button class="button button-primary" type="button" data-action="copy">Copy</button>
+          <button class="button button-primary copy" type="button" data-action="copy" title="Copy the clean text (Ctrl+Enter)" aria-keyshortcuts="Control+Enter Meta+Enter">Copy</button>
         </div>
       </div>
       <textarea id="output" readonly spellcheck="false" placeholder="Your clean text appears here" data-output>{{ output }}</textarea>
       <p class="pane-foot changes" data-stats="after" aria-live="polite">
         {% if after %}
+        {% if output == text and not options.is_noop %}
+        <span class="already-clean">Already clean, nothing to change</span>
+        {% else %}
         <span>{% include "tools/_delta.html" with label="character" a=before.characters b=after.characters %}</span>
         <span>{% include "tools/_delta.html" with label="word" a=before.words b=after.words %}</span>
         <span>{% include "tools/_delta.html" with label="line" a=before.lines b=after.lines %}</span>
+        {% endif %}
         {% endif %}
       </p>
     </div>

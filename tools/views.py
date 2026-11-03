@@ -148,6 +148,7 @@ def tool_page(request: HttpRequest, slug: str = "") -> HttpResponse:
             "tools": TOOLS,
             "options": options,
             "text": text,
+            "is_example": request.method != "POST",
             "output": output if output is not None else "",
             "error": error,
             "before": before,
