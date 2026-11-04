@@ -15,6 +15,9 @@ from tools.catalog import COMMON_FAQS, HOME, TOOLS, TOOLS_BY_SLUG, Tool
 
 MAX_INPUT_CHARS = 200_000
 
+# Google Search Console ownership check. Keep it live or the site loses verification.
+GOOGLE_VERIFICATION_FILE = "google4adfdcaade9a40a0.html"
+
 LINE_BREAK_CHOICES = (
     ("keep", "Keep", "Leave line breaks as they are"),
     ("paragraphs", "Join lines", "Join broken lines, keep paragraphs (best for PDFs)"),
@@ -200,6 +203,15 @@ def robots_txt(request: HttpRequest) -> HttpResponse:
         "",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+
+
+@require_GET
+@cache_control(public=True, max_age=86400)
+def google_site_verification(request: HttpRequest) -> HttpResponse:
+    return HttpResponse(
+        f"google-site-verification: {GOOGLE_VERIFICATION_FILE}",
+        content_type="text/html; charset=utf-8",
+    )
 
 
 @require_GET
