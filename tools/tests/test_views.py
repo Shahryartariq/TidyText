@@ -60,6 +60,12 @@ class PageTests(SimpleTestCase):
         for tool in TOOLS:
             self.assertContains(sitemap, f"/{tool.slug}/</loc>")
 
+    def test_google_site_verification_file(self):
+        response = self.client.get("/google4adfdcaade9a40a0.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"google-site-verification: google4adfdcaade9a40a0.html")
+        self.assertTrue(response["Content-Type"].startswith("text/html"))
+
     def test_healthz(self):
         response = self.client.get("/healthz")
         self.assertEqual(response.content, b"ok")
